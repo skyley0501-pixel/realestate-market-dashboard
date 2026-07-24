@@ -30,21 +30,36 @@ npm run dev
 
 | コマンド | 内容 | 期待される結果 |
 |---|---|---|
-| `npm run dev` | 開発サーバー起動 | `http://localhost:3000` にデフォルトページが表示される |
+| `npm run dev` | 開発サーバー起動 | `http://localhost:3000` にヘッダー・フッター付きのトップページが表示される |
 | `npm run build` | 本番ビルド | エラーなくビルドが完了する |
 | `npm run lint` | ESLint実行 | `0 problems` で終了する |
+| `npm run typecheck` | TypeScript型チェック | エラーなく終了する |
 
 ### エラー時の対処
 
 - `npm run dev` 後にブラウザで真っ白/404になる場合: ターミナルのビルドログにエラーが出ていないか確認し、`.next` フォルダを削除して再起動する（`rm -rf .next && npm run dev`）。
 - `npm run lint` でエラーが出た場合: メッセージに従い該当ファイルを修正する。`any` 型の使用は許可していないため、具体的な型または `unknown` + 型ガードに置き換える。
 - `npm install` が失敗する場合: Node.js のバージョンを確認する（開発時は Node v24 系を使用）。
+- shadcn/uiコンポーネントの追加でエラーになる場合: `npx shadcn@latest add <component名>` を実行し、`components.json` の設定（エイリアス `@/*`）が壊れていないか確認する。
+
+## UIコンポーネント
+
+[shadcn/ui](https://ui.shadcn.com/) を導入済み。コンポーネントは `src/components/ui/` に生成され、追加は以下のコマンドで行う。
+
+```bash
+npx shadcn@latest add <component名>
+```
+
+共通レイアウト（ヘッダー・フッター）は `src/components/layout/` に配置し、`src/app/layout.tsx` の `RootLayout` で全ページに適用している。
 
 ## ディレクトリ構成（現時点）
 
 ```
-src/app/        # Next.js App Router（ページ・レイアウト）
-docs/           # 要件定義・設計・ロードマップ
+src/app/               # Next.js App Router（ページ・レイアウト）
+src/components/ui/      # shadcn/ui コンポーネント
+src/components/layout/  # ヘッダー・フッターなど全ページ共通のレイアウト
+src/lib/                # 汎用ユーティリティ（cn 等）
+docs/                   # 要件定義・設計・ロードマップ
 ```
 
 機能追加に伴い `src/features/`（Feature First × Clean Architecture）を追加していく。詳細は [`docs/design.md`](./docs/design.md) を参照。
