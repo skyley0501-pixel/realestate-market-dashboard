@@ -5,6 +5,7 @@
 - 要件定義: [`docs/requirements.md`](./docs/requirements.md)
 - 設計書: [`docs/design.md`](./docs/design.md)
 - 実装ロードマップ: [`docs/roadmap.md`](./docs/roadmap.md)
+- 設計判断の記録（ADR）: [`docs/adr/`](./docs/adr/)
 
 ## 技術スタック
 
