@@ -1,6 +1,9 @@
 import Link from "next/link";
 
-const NAV_LINKS = [{ href: "/", label: "ホーム" }] as const;
+const NAV_LINKS = [
+  { href: "/", label: "ホーム" },
+  { href: "/transactions", label: "取引検索" },
+] as const;
 
 export function Header() {
   return (

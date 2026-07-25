@@ -136,6 +136,17 @@ curl "http://localhost:3000/api/transactions/<id>"
 # => 200 {"data":{...}}  / 存在しないIDなら 404 {"error":{"code":"TRANSACTION_NOT_FOUND",...}}
 ```
 
+## ページ
+
+### `/transactions`
+
+取引一覧ページ（Server Component、SSR）。1ページ20件、`?page=N`でページネーション（総件数取得を避けるため`limit+1`件取得し、超過分の有無で「次へ」の活性/非活性を判定）。
+
+```bash
+npm run dev
+# ブラウザで http://localhost:3000/transactions を開く
+```
+
 ## ディレクトリ構成（現時点）
 
 ```
@@ -147,10 +158,11 @@ src/shared/domain/                       # 共有ドメイン基盤（Money, Dom
 src/shared/application/                  # 共有アプリケーション層基盤（Result型, ApplicationError）
 src/shared/infrastructure/prisma/        # PrismaClientシングルトン（driver adapter経由でSupabaseに接続）
 src/shared/infrastructure/http/          # requestId発行・共通エラーハンドラ（handleRouteError）
+src/app/transactions/                    # 取引一覧ページ
 src/features/transaction/domain/         # transaction機能のドメイン層（Entity・VO・Repository interface）
 src/features/transaction/application/    # transaction機能のアプリケーション層（UseCase）
 src/features/transaction/infrastructure/ # transaction機能のインフラ層（PrismaRepository実装・DIコンテナ）
-src/features/transaction/presentation/   # transaction機能のプレゼンテーション層（Zodスキーマ・DTOマッパー）
+src/features/transaction/presentation/   # transaction機能のプレゼンテーション層（Zodスキーマ・DTOマッパー・TransactionTable等）
 src/app/api/transactions/                # 取引検索API（GET /api/transactions）
 src/generated/prisma/                    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
