@@ -109,8 +109,9 @@ src/components/ui/       # shadcn/ui コンポーネント
 src/components/layout/   # ヘッダー・フッターなど全ページ共通のレイアウト
 src/lib/                 # 汎用ユーティリティ（cn 等）
 src/shared/domain/       # 共有ドメイン基盤（Money, DomainError等の値オブジェクト・エラー）
-src/shared/application/  # 共有アプリケーション層基盤（Result型）
-src/features/transaction/domain/  # transaction機能のドメイン層（Entity・VO・Repository interface）
+src/shared/application/  # 共有アプリケーション層基盤（Result型, ApplicationError）
+src/features/transaction/domain/       # transaction機能のドメイン層（Entity・VO・Repository interface）
+src/features/transaction/application/  # transaction機能のアプリケーション層（UseCase）
 src/generated/prisma/    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
 scripts/                 # データ取得等のシード用スクリプト（Next.jsのビルド対象外）
