@@ -36,7 +36,7 @@ npm run dev
 | `npm run build` | 本番ビルド | エラーなくビルドが完了する |
 | `npm run lint` | ESLint実行 | `0 problems` で終了する |
 | `npm run typecheck` | TypeScript型チェック | エラーなく終了する |
-| `npm test` | 単体テスト（Node標準テストランナー） | クレンジングロジック等のテストが全て通る |
+| `npm test` | 単体テスト（Vitest） | 全テストが通る |
 | `npm run db:pull` | Supabaseへの接続確認（introspection） | エラーなく接続でき、テーブルがあれば `schema.prisma` に反映される |
 
 ### エラー時の対処
@@ -108,6 +108,8 @@ src/app/                 # Next.js App Router（ページ・レイアウト）
 src/components/ui/       # shadcn/ui コンポーネント
 src/components/layout/   # ヘッダー・フッターなど全ページ共通のレイアウト
 src/lib/                 # 汎用ユーティリティ（cn 等）
+src/shared/domain/       # 共有ドメイン基盤（Money, DomainError等の値オブジェクト・エラー）
+src/shared/application/  # 共有アプリケーション層基盤（Result型）
 src/generated/prisma/    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
 scripts/                 # データ取得等のシード用スクリプト（Next.jsのビルド対象外）

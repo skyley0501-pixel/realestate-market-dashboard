@@ -12,7 +12,7 @@
     "db:generate": "prisma generate",
     "fetch:reinfolib": "node scripts/fetch-reinfolib.ts",
     "db:seed": "prisma db seed",
-    "test": "node --test \"prisma/**/*.test.ts\""
+    "test": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -40,6 +40,7 @@
     "prisma": "^7.9.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
