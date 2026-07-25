@@ -102,6 +102,31 @@ npm run db:seed
 - `data/reinfolib/` にJSONが無い場合は何もせずメッセージを表示して終了する（DBへの書き込みは行わない）
 - 都道府県コードはAPIレスポンスに含まれないため、市区町村コード（JIS X0402）の先頭2桁から導出している
 
+## API
+
+### `GET /api/transactions`
+
+取引検索。クエリパラメータは全て任意。
+
+| パラメータ | 型 | 説明 |
+|---|---|---|
+| `municipalityCode` | string | 市区町村コード |
+| `propertyType` | string | 取引の種類（例: 中古マンション等） |
+| `floorPlan` | string | 間取り |
+| `minPrice` / `maxPrice` | number（円） | 価格帯 |
+| `limit` | number（1〜100） | 取得件数上限 |
+| `offset` | number | オフセット |
+
+```bash
+npm run dev
+curl "http://localhost:3000/api/transactions?municipalityCode=13113&limit=10"
+# => {"data":[...]}
+curl "http://localhost:3000/api/transactions?limit=abc"
+# => 400 {"error":{"code":"VALIDATION_ERROR",...}}
+```
+
+エラーレスポンスは共通形式 `{ "error": { "code", "message", "requestId" } }` で返す（`src/shared/infrastructure/http/handle-route-error.ts`）。
+
 ## ディレクトリ構成（現時点）
 
 ```
@@ -112,9 +137,12 @@ src/lib/                 # 汎用ユーティリティ（cn 等）
 src/shared/domain/                       # 共有ドメイン基盤（Money, DomainError等の値オブジェクト・エラー）
 src/shared/application/                  # 共有アプリケーション層基盤（Result型, ApplicationError）
 src/shared/infrastructure/prisma/        # PrismaClientシングルトン（driver adapter経由でSupabaseに接続）
+src/shared/infrastructure/http/          # requestId発行・共通エラーハンドラ（handleRouteError）
 src/features/transaction/domain/         # transaction機能のドメイン層（Entity・VO・Repository interface）
 src/features/transaction/application/    # transaction機能のアプリケーション層（UseCase）
 src/features/transaction/infrastructure/ # transaction機能のインフラ層（PrismaRepository実装・DIコンテナ）
+src/features/transaction/presentation/   # transaction機能のプレゼンテーション層（Zodスキーマ・DTOマッパー）
+src/app/api/transactions/                # 取引検索API（GET /api/transactions）
 src/generated/prisma/                    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
 scripts/                 # データ取得等のシード用スクリプト（Next.jsのビルド対象外）
