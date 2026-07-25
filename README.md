@@ -110,6 +110,7 @@ src/components/layout/   # ヘッダー・フッターなど全ページ共通�
 src/lib/                 # 汎用ユーティリティ（cn 等）
 src/shared/domain/       # 共有ドメイン基盤（Money, DomainError等の値オブジェクト・エラー）
 src/shared/application/  # 共有アプリケーション層基盤（Result型）
+src/features/transaction/domain/  # transaction機能のドメイン層（Entity・VO・Repository interface）
 src/generated/prisma/    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
 scripts/                 # データ取得等のシード用スクリプト（Next.jsのビルド対象外）
@@ -117,4 +118,4 @@ data/                    # スクリプトが取得した生データ（gitignor
 docs/                    # 要件定義・設計・ロードマップ
 ```
 
-機能追加に伴い `src/features/`（Feature First × Clean Architecture）を追加していく。詳細は [`docs/design.md`](./docs/design.md) を参照。
+`src/features/{context}`はFeature First × Clean Architectureで、機能ごとに`domain/application/infrastructure/presentation`の4層を持つ。詳細は [`docs/design.md`](./docs/design.md) を参照。
