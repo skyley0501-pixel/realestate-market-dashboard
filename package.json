@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:pull": "prisma db pull",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "fetch:reinfolib": "node scripts/fetch-reinfolib.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

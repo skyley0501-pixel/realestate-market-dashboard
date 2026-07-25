@@ -70,6 +70,24 @@ npm run db:pull      # Supabaseの現在のスキーマをschema.prismaに反映
 npm run db:generate  # Prisma Clientを生成（src/generated/prisma、gitignore対象）
 ```
 
+## データ取得スクリプト（不動産情報ライブラリAPI）
+
+[不動産情報ライブラリ](https://www.reinfolib.mlit.go.jp/) の不動産価格情報取得API（XIT001）から取引データを取得し、`data/reinfolib/`（gitignore対象）にJSONとして保存する。
+
+```bash
+# APIキー無しでURL・対象四半期の組み立てのみ確認する
+node scripts/fetch-reinfolib.ts --area 13 --quarters 4 --dry-run
+
+# 実データ取得（.env に REINFOLIB_API_KEY が必要）
+npm run fetch:reinfolib -- --area 13 --quarters 4
+```
+
+- `--area`: 都道府県コード（例: 東京都=13、デフォルトは13）
+- `--quarters`: 直近何四半期分を取得するか（デフォルト4、進行中の四半期は含めない）
+- `--out-dir`: 保存先ディレクトリ（デフォルト `data/reinfolib`）
+- APIキーは[APIマニュアル](https://www.reinfolib.mlit.go.jp/help/apiManual/xit001/)から利用申請し、`.env` の `REINFOLIB_API_KEY` に設定する（`.env.example` にキー名のコメント記載済み。値は各自のローカル環境で設定する）
+- APIレスポンスに最寄駅情報は含まれないため、`Transaction.stationId` 等は別途の駅名寄せ処理まではこのスクリプトの対象外
+
 ## ディレクトリ構成（現時点）
 
 ```
@@ -79,6 +97,8 @@ src/components/layout/   # ヘッダー・フッターなど全ページ共通�
 src/lib/                 # 汎用ユーティリティ（cn 等）
 src/generated/prisma/    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
+scripts/                 # データ取得等のシード用スクリプト（Next.jsのビルド対象外）
+data/                    # スクリプトが取得した生データ（gitignore対象）
 docs/                    # 要件定義・設計・ロードマップ
 ```
 

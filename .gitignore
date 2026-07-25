@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# reinfolib API 取得結果（生データ、クレンジング前）
+/data/reinfolib
