@@ -11,3 +11,37 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// 都道府県マスタ（JIS X 0401 都道府県コード、2桁）
+model Prefecture {
+  code           String         @id
+  name           String
+  municipalities Municipality[]
+
+  @@map("prefectures")
+}
+
+// 市区町村マスタ（JIS X 0402 市区町村コード、5桁）
+model Municipality {
+  code           String     @id
+  name           String
+  prefectureCode String     @map("prefecture_code")
+  prefecture     Prefecture @relation(fields: [prefectureCode], references: [code])
+  stations       Station[]
+
+  @@map("municipalities")
+}
+
+// 駅マスタ（国土数値情報 駅データ由来）
+model Station {
+  id               String       @id @default(cuid())
+  name             String
+  line             String?
+  municipalityCode String       @map("municipality_code")
+  municipality     Municipality @relation(fields: [municipalityCode], references: [code])
+  latitude         Float?
+  longitude        Float?
+
+  @@unique([name, line])
+  @@map("stations")
+}
