@@ -127,6 +127,15 @@ curl "http://localhost:3000/api/transactions?limit=abc"
 
 エラーレスポンスは共通形式 `{ "error": { "code", "message", "requestId" } }` で返す（`src/shared/infrastructure/http/handle-route-error.ts`）。
 
+### `GET /api/transactions/:id`
+
+取引詳細。存在しないIDの場合は404（`TRANSACTION_NOT_FOUND`）を返す。
+
+```bash
+curl "http://localhost:3000/api/transactions/<id>"
+# => 200 {"data":{...}}  / 存在しないIDなら 404 {"error":{"code":"TRANSACTION_NOT_FOUND",...}}
+```
+
 ## ディレクトリ構成（現時点）
 
 ```
