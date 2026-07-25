@@ -142,6 +142,8 @@ curl "http://localhost:3000/api/transactions/<id>"
 
 取引一覧ページ（Server Component、SSR）。1ページ20件、`?page=N`でページネーション（総件数取得を避けるため`limit+1`件取得し、超過分の有無で「次へ」の活性/非活性を判定）。
 
+`TransactionFilterPanel`（Client Component、React Hook Form + Zod）で市区町村コード/種類/間取り/価格帯を絞り込み可能。フィルタ変更は`router.push`でURL query paramsに反映され（例: `?municipalityCode=13113&minPrice=50000000`）、SSR側がそれを読んで再検索する。ページ送りリンクも現在のフィルタ条件を維持する。「リセット」で条件をクリアし`/transactions`に戻る。
+
 ```bash
 npm run dev
 # ブラウザで http://localhost:3000/transactions を開く
