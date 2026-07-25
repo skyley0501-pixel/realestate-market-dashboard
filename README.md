@@ -36,6 +36,7 @@ npm run dev
 | `npm run build` | 本番ビルド | エラーなくビルドが完了する |
 | `npm run lint` | ESLint実行 | `0 problems` で終了する |
 | `npm run typecheck` | TypeScript型チェック | エラーなく終了する |
+| `npm test` | 単体テスト（Node標準テストランナー） | クレンジングロジック等のテストが全て通る |
 | `npm run db:pull` | Supabaseへの接続確認（introspection） | エラーなく接続でき、テーブルがあれば `schema.prisma` に反映される |
 
 ### エラー時の対処
@@ -87,6 +88,18 @@ npm run fetch:reinfolib -- --area 13 --quarters 4
 - `--out-dir`: 保存先ディレクトリ（デフォルト `data/reinfolib`）
 - APIキーは[APIマニュアル](https://www.reinfolib.mlit.go.jp/help/apiManual/xit001/)から利用申請し、`.env` の `REINFOLIB_API_KEY` に設定する（`.env.example` にキー名のコメント記載済み。値は各自のローカル環境で設定する）
 - APIレスポンスに最寄駅情報は含まれないため、`Transaction.stationId` 等は別途の駅名寄せ処理まではこのスクリプトの対象外
+
+## シードデータ投入
+
+取得したJSON（`data/reinfolib/*.json`）をクレンジングし、`Prefecture`/`Municipality`をupsertした上で`Transaction`へ投入する。
+
+```bash
+npm run db:seed
+```
+
+- 変換ロジック（価格・面積・築年数・取引時期の正規化）は `prisma/lib/reinfolib-transform.ts` に純粋関数として実装し、`npm test` でAPIキー無しでも検証できる
+- `data/reinfolib/` にJSONが無い場合は何もせずメッセージを表示して終了する（DBへの書き込みは行わない）
+- 都道府県コードはAPIレスポンスに含まれないため、市区町村コード（JIS X0402）の先頭2桁から導出している
 
 ## ディレクトリ構成（現時点）
 

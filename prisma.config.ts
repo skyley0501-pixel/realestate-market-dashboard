@@ -7,6 +7,7 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
     // CLI操作(migrate/db pull等)はSupabaseのTransaction poolerがintrospectionに対応しないため、
