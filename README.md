@@ -149,6 +149,10 @@ npm run dev
 # ブラウザで http://localhost:3000/transactions を開く
 ```
 
+### `/transactions/:id`
+
+取引詳細ページ（Server Component、SSR）。存在しないIDは`notFound()`でNext.js標準の404ページを表示する。「一覧に戻る」はURL固定リンクではなく`router.back()`（Client Component）を使い、一覧側の検索条件・ページ位置を維持する。
+
 ## ディレクトリ構成（現時点）
 
 ```
@@ -160,7 +164,7 @@ src/shared/domain/                       # 共有ドメイン基盤（Money, Dom
 src/shared/application/                  # 共有アプリケーション層基盤（Result型, ApplicationError）
 src/shared/infrastructure/prisma/        # PrismaClientシングルトン（driver adapter経由でSupabaseに接続）
 src/shared/infrastructure/http/          # requestId発行・共通エラーハンドラ（handleRouteError）
-src/app/transactions/                    # 取引一覧ページ
+src/app/transactions/                    # 取引一覧ページ・取引詳細ページ（[id]）
 src/features/transaction/domain/         # transaction機能のドメイン層（Entity・VO・Repository interface）
 src/features/transaction/application/    # transaction機能のアプリケーション層（UseCase）
 src/features/transaction/infrastructure/ # transaction機能のインフラ層（PrismaRepository実装・DIコンテナ）
