@@ -47,4 +47,4 @@ next-env.d.ts
 /data/reinfolib
 
 # 記事・書籍化用ネタメモ（将来のnote/Kindle販売用の下書き、リポジトリ公開時にも非公開のまま保つ）
-/docs/arcticle-notes
+/docs/article-notes

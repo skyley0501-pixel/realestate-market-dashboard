@@ -36,7 +36,8 @@ npm run dev
 | `npm run build` | 本番ビルド | エラーなくビルドが完了する |
 | `npm run lint` | ESLint実行 | `0 problems` で終了する |
 | `npm run typecheck` | TypeScript型チェック | エラーなく終了する |
-| `npm test` | 単体テスト（Vitest） | 全テストが通る |
+| `npm test` | 単体テスト（Vitest、DB非依存） | 全テストが通る |
+| `npm run test:integration` | 結合テスト（Vitest、実際のSupabaseに接続） | 全テストが通る（`.env`の`DATABASE_URL`/`DIRECT_URL`が必要） |
 | `npm run db:pull` | Supabaseへの接続確認（introspection） | エラーなく接続でき、テーブルがあれば `schema.prisma` に反映される |
 
 ### エラー時の対処
@@ -108,11 +109,13 @@ src/app/                 # Next.js App Router（ページ・レイアウト）
 src/components/ui/       # shadcn/ui コンポーネント
 src/components/layout/   # ヘッダー・フッターなど全ページ共通のレイアウト
 src/lib/                 # 汎用ユーティリティ（cn 等）
-src/shared/domain/       # 共有ドメイン基盤（Money, DomainError等の値オブジェクト・エラー）
-src/shared/application/  # 共有アプリケーション層基盤（Result型, ApplicationError）
-src/features/transaction/domain/       # transaction機能のドメイン層（Entity・VO・Repository interface）
-src/features/transaction/application/  # transaction機能のアプリケーション層（UseCase）
-src/generated/prisma/    # Prisma Client生成コード（gitignore対象、db:generateで生成）
+src/shared/domain/                       # 共有ドメイン基盤（Money, DomainError等の値オブジェクト・エラー）
+src/shared/application/                  # 共有アプリケーション層基盤（Result型, ApplicationError）
+src/shared/infrastructure/prisma/        # PrismaClientシングルトン（driver adapter経由でSupabaseに接続）
+src/features/transaction/domain/         # transaction機能のドメイン層（Entity・VO・Repository interface）
+src/features/transaction/application/    # transaction機能のアプリケーション層（UseCase）
+src/features/transaction/infrastructure/ # transaction機能のインフラ層（PrismaRepository実装・DIコンテナ）
+src/generated/prisma/                    # Prisma Client生成コード（gitignore対象、db:generateで生成）
 prisma/schema.prisma     # DBスキーマ定義
 scripts/                 # データ取得等のシード用スクリプト（Next.jsのビルド対象外）
 data/                    # スクリプトが取得した生データ（gitignore対象）

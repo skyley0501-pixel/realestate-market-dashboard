@@ -12,7 +12,8 @@
     "db:generate": "prisma generate",
     "fetch:reinfolib": "node scripts/fetch-reinfolib.ts",
     "db:seed": "prisma db seed",
-    "test": "vitest run"
+    "test": "vitest run --exclude \"**/*.integration.test.ts\"",
+    "test:integration": "vitest run integration"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
