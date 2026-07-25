@@ -46,5 +46,6 @@ next-env.d.ts
 # reinfolib API 取得結果（生データ、クレンジング前）
 /data/reinfolib
 
-# 記事・書籍化用ネタメモ（将来のnote/Kindle販売用の下書き、リポジトリ公開時にも非公開のまま保つ）
+# 記事・書籍化用ネタメモ・素材（将来のnote/Kindle販売用の下書き、リポジトリ公開時にも非公開のまま保つ）
 /docs/article-notes
+/docs/screenshot
