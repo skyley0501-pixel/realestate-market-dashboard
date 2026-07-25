@@ -25,23 +25,52 @@ model Prefecture {
 model Municipality {
   code           String     @id
   name           String
-  prefectureCode String     @map("prefecture_code")
-  prefecture     Prefecture @relation(fields: [prefectureCode], references: [code])
+  prefectureCode String        @map("prefecture_code")
+  prefecture     Prefecture    @relation(fields: [prefectureCode], references: [code])
   stations       Station[]
+  transactions   Transaction[]
 
   @@map("municipalities")
 }
 
 // 駅マスタ（国土数値情報 駅データ由来）
 model Station {
-  id               String       @id @default(cuid())
+  id               String        @id @default(cuid())
   name             String
   line             String?
-  municipalityCode String       @map("municipality_code")
-  municipality     Municipality @relation(fields: [municipalityCode], references: [code])
+  municipalityCode String        @map("municipality_code")
+  municipality     Municipality  @relation(fields: [municipalityCode], references: [code])
   latitude         Float?
   longitude        Float?
+  transactions     Transaction[]
 
   @@unique([name, line])
   @@map("stations")
+}
+
+// 不動産取引情報（国土交通省 不動産情報ライブラリ「不動産価格情報」由来）
+model Transaction {
+  id                   String       @id @default(cuid())
+  municipalityCode     String       @map("municipality_code")
+  municipality         Municipality @relation(fields: [municipalityCode], references: [code])
+  stationId            String?      @map("station_id")
+  station              Station?     @relation(fields: [stationId], references: [id])
+  timeToStationMinutes Int?         @map("time_to_station_minutes")
+  transactionPeriod    String       @map("transaction_period") // 例: "2024Q3"
+  propertyType         String       @map("property_type") // 宅地(土地)/宅地(土地と建物)/中古マンション等/林地/農地
+  priceYen             BigInt       @map("price_yen") // 取引価格（総額、円）
+  areaSqm              Float        @map("area_sqm")
+  floorPlan            String?      @map("floor_plan") // 例: "3LDK"
+  buildingYear         Int?         @map("building_year")
+  structure            String?
+  use                  String?
+  remarks              String?
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  @@index([municipalityCode])
+  @@index([stationId])
+  @@index([transactionPeriod])
+  @@index([propertyType])
+  @@map("transactions")
 }

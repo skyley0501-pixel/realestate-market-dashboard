@@ -59,7 +59,7 @@ npx shadcn@latest add <component名>
 
 ## データベース（Supabase / Prisma）
 
-- `prisma/schema.prisma`: モデル定義（`Prefecture` / `Municipality` / `Station` の基礎マスタを定義済み。`Prefecture` 1:N `Municipality` 1:N `Station`）
+- `prisma/schema.prisma`: モデル定義（`Prefecture` / `Municipality` / `Station` の基礎マスタと `Transaction`（取引情報）を定義済み。`Municipality`・`Station` は `Transaction` と1:Nで関連）
 - `prisma.config.ts`: PrismaのCLI（migrate/db pull等）が使う接続先を設定。SupabaseのTransaction pooler（6543）はCLIのintrospection/migrateに対応しないため、CLI操作は常に`DIRECT_URL`（Session pooler, 5432）を使う
 - アプリケーション実行時（Route Handler等）のPrisma Clientは、Prisma 7の仕様変更により `new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) })` のようにドライバアダプタを明示して生成する必要がある（`@prisma/adapter-pg` は機能実装時に追加予定）。この接続はTransaction pooler（`DATABASE_URL`）を使う
 
