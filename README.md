@@ -2,6 +2,15 @@
 
 東京都・神奈川県・千葉県・埼玉県を対象に、国土交通省「不動産情報ライブラリ」のデータを用いて不動産市場を分析するダッシュボード。転職活動用ポートフォリオとして開発中。
 
+## 🎉 Phase1 Completed（Day1〜18）
+
+- ✅ Vercel公開完了（[公開URL](https://realestate-market-dashboard.vercel.app/)）
+- ✅ SSR一覧・詳細・検索実装
+- ✅ 国交省API取り込み基盤完成
+- ✅ Clean Architecture × DDD基盤完成
+
+🚀 次は分析機能・AI活用（Phase2）
+
 - 公開URL: https://realestate-market-dashboard.vercel.app/（現時点では実データ未投入のため一覧は空の状態）
 - 要件定義: [`docs/requirements.md`](./docs/requirements.md)
 - 設計書: [`docs/design.md`](./docs/design.md)
