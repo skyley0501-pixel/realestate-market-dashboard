@@ -2,6 +2,7 @@
 
 東京都・神奈川県・千葉県・埼玉県を対象に、国土交通省「不動産情報ライブラリ」のデータを用いて不動産市場を分析するダッシュボード。転職活動用ポートフォリオとして開発中。
 
+- 公開URL: https://realestate-market-dashboard.vercel.app/（現時点では実データ未投入のため一覧は空の状態）
 - 要件定義: [`docs/requirements.md`](./docs/requirements.md)
 - 設計書: [`docs/design.md`](./docs/design.md)
 - 実装ロードマップ: [`docs/roadmap.md`](./docs/roadmap.md)
@@ -161,6 +162,22 @@ npm run dev
 ### `/about`
 
 開発の背景・問題意識、アーキテクチャ方針（Clean Architecture × Feature First × DDD）、技術スタックを掲載。開発の問題意識は現時点ではプレースホルダー（`[ここに開発動機・問題意識を記入]`）のため、後日実際の内容に差し替える。
+
+## デプロイ（Vercel）
+
+GitHubリポジトリ（`main`ブランチ）と連携し、pushごとに自動デプロイされる。Framework Preset・Build Commandはデフォルト（`next build`）のまま。
+
+環境変数（Project Settings > Environment Variables）:
+
+| 変数名 | 必須 | 備考 |
+|---|---|---|
+| `DATABASE_URL` | 必須 | SupabaseのTransaction pooler接続文字列。アプリの実行時に使用 |
+| `DIRECT_URL` | 任意 | SupabaseのSession pooler接続文字列。現状Vercel上のビルド/実行では未使用だが、将来`prisma migrate deploy`をVercel上で実行する場合に備えて設定 |
+| `REINFOLIB_API_KEY` | 任意 | アプリの実行時には使用しない（`scripts/fetch-reinfolib.ts`等ローカル実行のスクリプト専用） |
+
+`npm install`だけでは`src/generated/prisma`（gitignore対象）が生成されずビルドが失敗するため、`package.json`の`postinstall`で`prisma generate`を実行するようにしてある。
+
+Vercelは[Hobbyプラン（無料）](https://vercel.com/docs/limits/fair-use-guidelines#commercial-usage)を利用。Hobbyは非商用個人利用限定のため、決済・広告・有償コンテンツの販売宣伝等をサイトに追加する場合はProプランへの切り替えを検討する。
 
 ## ディレクトリ構成（現時点）
 
