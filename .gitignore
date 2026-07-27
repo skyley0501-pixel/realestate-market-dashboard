@@ -47,7 +47,7 @@ next-env.d.ts
 /data/reinfolib
 
 # 記事・書籍化用ネタメモ・素材（将来のnote/Kindle販売用の下書き、リポジトリ公開時にも非公開のまま保つ）
-/docs/article-notes
+/docs/arcticle-notes
 /docs/screenshot
 
 # GPTレビュー保存先（開発中の内部メモ、非公開）
