@@ -32,4 +32,9 @@ export class TrendRate {
   get isDecrease(): boolean {
     return this.ratePercent < 0;
   }
+
+  // 永続化済みの計算済み変化率からの復元用（Infrastructure層のRepositoryがDBの行から復元する際に使う）。
+  static reconstruct(ratePercent: number): TrendRate {
+    return new TrendRate(ratePercent);
+  }
 }

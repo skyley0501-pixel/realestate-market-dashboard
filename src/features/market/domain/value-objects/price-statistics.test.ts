@@ -27,4 +27,14 @@ describe("PriceStatistics", () => {
   it("価格が1件も無い場合はEmptyPriceListErrorを投げる", () => {
     expect(() => PriceStatistics.calculate([])).toThrow(EmptyPriceListError);
   });
+
+  it("reconstructは再計算せず渡された値をそのまま保持する", () => {
+    const stats = PriceStatistics.reconstruct(yen(30), yen(32), yen(20), yen(40), 5);
+
+    expect(stats.median.yen).toBe(30n);
+    expect(stats.average.yen).toBe(32n);
+    expect(stats.q1.yen).toBe(20n);
+    expect(stats.q3.yen).toBe(40n);
+    expect(stats.sampleSize).toBe(5);
+  });
 });

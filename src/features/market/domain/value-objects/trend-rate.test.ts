@@ -25,4 +25,10 @@ describe("TrendRate", () => {
   it("前期の価格が0円の場合はZeroBasePriceErrorを投げる", () => {
     expect(() => TrendRate.calculate(Money.fromYen(1000), Money.fromYen(0))).toThrow(ZeroBasePriceError);
   });
+
+  it("reconstructは渡された変化率をそのまま保持する", () => {
+    const rate = TrendRate.reconstruct(-5.5);
+    expect(rate.percent).toBe(-5.5);
+    expect(rate.isDecrease).toBe(true);
+  });
 });

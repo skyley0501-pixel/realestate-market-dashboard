@@ -56,4 +56,10 @@ export class PriceStatistics {
       filtered.length,
     );
   }
+
+  // 永続化済みの計算済み統計量からの復元用（Infrastructure層のRepositoryがDBの行から復元する際に使う）。
+  // calculate()と異なり再計算は行わない。
+  static reconstruct(median: Money, average: Money, q1: Money, q3: Money, sampleSize: number): PriceStatistics {
+    return new PriceStatistics(median, average, q1, q3, sampleSize);
+  }
 }
