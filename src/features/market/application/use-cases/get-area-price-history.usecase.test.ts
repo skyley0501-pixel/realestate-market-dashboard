@@ -4,12 +4,12 @@ import { AreaMarketSnapshot } from "../../domain/aggregates/area-market-snapshot
 import { Area } from "../../domain/entities/area";
 import type { AreaRepository } from "../../domain/repositories/area-repository";
 import { PriceStatistics } from "../../domain/value-objects/price-statistics";
-import { ListAreasUseCase } from "./list-areas.usecase";
+import { GetAreaPriceHistoryUseCase } from "./get-area-price-history.usecase";
 
-function buildSnapshot(code: string): AreaMarketSnapshot {
+function buildSnapshot(period: string): AreaMarketSnapshot {
   return AreaMarketSnapshot.create({
-    area: Area.create({ code, name: "千代田区", prefectureCode: "13", prefectureName: "東京都" }),
-    period: "2025Q4",
+    area: Area.create({ code: "13101", name: "千代田区", prefectureCode: "13", prefectureName: "東京都" }),
+    period,
     statistics: PriceStatistics.reconstruct(
       Money.fromYen(50_000_000),
       Money.fromYen(52_000_000),
@@ -32,15 +32,15 @@ function buildMockRepository(overrides: Partial<AreaRepository> = {}): AreaRepos
   };
 }
 
-describe("ListAreasUseCase", () => {
-  it("正常系: リポジトリから取得したスナップショット一覧を返す", async () => {
-    const snapshots = [buildSnapshot("13101"), buildSnapshot("13102")];
+describe("GetAreaPriceHistoryUseCase", () => {
+  it("正常系: リポジトリから取得した期間昇順の履歴を返す", async () => {
+    const history = [buildSnapshot("2025Q3"), buildSnapshot("2025Q4")];
     const repository = buildMockRepository({
-      findLatestSnapshots: vi.fn().mockResolvedValue(snapshots),
+      findSnapshotHistoryByCode: vi.fn().mockResolvedValue(history),
     });
-    const useCase = new ListAreasUseCase(repository);
+    const useCase = new GetAreaPriceHistoryUseCase(repository);
 
-    const result = await useCase.execute();
+    const result = await useCase.execute({ code: "13101" });
 
     result.match(
       (value) => expect(value).toHaveLength(2),
@@ -48,21 +48,22 @@ describe("ListAreasUseCase", () => {
         throw new Error("unreachable");
       },
     );
+    expect(repository.findSnapshotHistoryByCode).toHaveBeenCalledWith("13101");
   });
 
-  it("Repositoryが例外を投げた場合はAREA_LIST_FAILEDのResult.errを返す", async () => {
+  it("Repositoryが例外を投げた場合はAREA_PRICE_HISTORY_FAILEDのResult.errを返す", async () => {
     const repository = buildMockRepository({
-      findLatestSnapshots: vi.fn().mockRejectedValue(new Error("DB down")),
+      findSnapshotHistoryByCode: vi.fn().mockRejectedValue(new Error("DB down")),
     });
-    const useCase = new ListAreasUseCase(repository);
+    const useCase = new GetAreaPriceHistoryUseCase(repository);
 
-    const result = await useCase.execute();
+    const result = await useCase.execute({ code: "13101" });
 
     result.match(
       () => {
         throw new Error("unreachable");
       },
-      (error) => expect(error.code).toBe("AREA_LIST_FAILED"),
+      (error) => expect(error.code).toBe("AREA_PRICE_HISTORY_FAILED"),
     );
   });
 });

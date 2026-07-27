@@ -28,6 +28,7 @@ function buildMockRepository(overrides: Partial<AreaRepository> = {}): AreaRepos
   return {
     findLatestSnapshots: vi.fn(),
     findLatestSnapshotByCode: vi.fn(),
+    findSnapshotHistoryByCode: vi.fn(),
     ...overrides,
   };
 }

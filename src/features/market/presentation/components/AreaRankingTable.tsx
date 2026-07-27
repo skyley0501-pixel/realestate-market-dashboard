@@ -9,19 +9,10 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import type { AreaSnapshotDto } from "../mappers/area-snapshot.mapper";
-
-const SQM_PER_TSUBO = 3.30578;
+import { formatTrendText, formatTsuboPrice, formatYen, trendColorClass } from "../lib/format";
 
 export type AreaSortKey = "unitPrice" | "trendRate" | "transactionCount";
 export type SortOrder = "asc" | "desc";
-
-function formatYen(priceYen: string): string {
-  return `${BigInt(priceYen).toLocaleString("ja-JP")}円`;
-}
-
-function formatTsuboPrice(avgUnitPriceYenPerSqm: number): string {
-  return `${Math.round(avgUnitPriceYenPerSqm * SQM_PER_TSUBO).toLocaleString("ja-JP")}円/坪`;
-}
 
 // クリックすると反転する（同じキーなら昇順⇔降順、別キーに切り替えた場合は降順から開始）ソートリンクのhrefを組み立てる
 function buildSortHref(key: AreaSortKey, currentSort: AreaSortKey, currentOrder: SortOrder): string {
@@ -55,13 +46,7 @@ function SortableHeader({
 }
 
 function TrendCell({ trendRatePercent }: { trendRatePercent: number | null }) {
-  if (trendRatePercent === null) {
-    return <span className="text-muted-foreground">-</span>;
-  }
-  const color =
-    trendRatePercent > 0 ? "text-emerald-600" : trendRatePercent < 0 ? "text-red-600" : "text-muted-foreground";
-  const sign = trendRatePercent > 0 ? "+" : "";
-  return <span className={color}>{`${sign}${trendRatePercent.toFixed(1)}%`}</span>;
+  return <span className={trendColorClass(trendRatePercent)}>{formatTrendText(trendRatePercent)}</span>;
 }
 
 export function AreaRankingTable({
@@ -97,7 +82,11 @@ export function AreaRankingTable({
       <TableBody>
         {areas.map((area) => (
           <TableRow key={area.code}>
-            <TableCell>{area.name}</TableCell>
+            <TableCell>
+              <Link href={`/areas/${area.code}`} className="hover:underline">
+                {area.name}
+              </Link>
+            </TableCell>
             <TableCell className="text-right">{formatYen(area.medianPriceYen)}</TableCell>
             <TableCell className="text-right">{formatTsuboPrice(area.avgUnitPriceYenPerSqm)}</TableCell>
             <TableCell className="text-right">

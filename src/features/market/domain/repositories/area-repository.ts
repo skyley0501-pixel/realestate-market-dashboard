@@ -6,4 +6,6 @@ export interface AreaRepository {
   findLatestSnapshots(): Promise<AreaMarketSnapshot[]>;
   // 指定エリアの最新期間のスナップショットを返す。該当エリアの集計結果が無ければnull
   findLatestSnapshotByCode(code: string): Promise<AreaMarketSnapshot | null>;
+  // 指定エリアの全期間のスナップショットを期間昇順で返す（価格推移グラフ用）
+  findSnapshotHistoryByCode(code: string): Promise<AreaMarketSnapshot[]>;
 }

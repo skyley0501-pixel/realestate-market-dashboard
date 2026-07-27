@@ -62,4 +62,13 @@ export class PrismaAreaRepository implements AreaRepository {
     });
     return row ? toSnapshot(row) : null;
   }
+
+  async findSnapshotHistoryByCode(code: string): Promise<AreaMarketSnapshot[]> {
+    const rows = await this.prisma.areaStatistics.findMany({
+      where: { municipalityCode: code },
+      orderBy: { period: "asc" },
+      include: { municipality: { include: { prefecture: true } } },
+    });
+    return rows.map(toSnapshot);
+  }
 }

@@ -200,6 +200,18 @@ npm run dev
 
 取引詳細ページ（Server Component、SSR）。存在しないIDは`notFound()`でNext.js標準の404ページを表示する。「一覧に戻る」はURL固定リンクではなく`router.back()`（Client Component）を使い、一覧側の検索条件・ページ位置を維持する。
 
+### `/areas`
+
+エリアランキングページ（Server Component、SSR）。`AreaRankingTable`で全エリアの最新期間のスナップショットを一覧表示し、坪単価・前期比・件数の列ヘッダークリックでソート（`?sort=unitPrice|trendRate|transactionCount&order=asc|desc`、同じ列を再クリックすると昇順⇔降順）。エリア名から`/areas/:code`へ遷移する。
+
+### `/areas/:code`
+
+エリア詳細ページ（Server Component、SSR）。存在しないコードは`notFound()`で404。
+
+- `AreaDetailHeader`: 中央値・坪単価・前期比・取引件数のサマリー
+- `PriceTrendChart`（Chart.js）: 全期間の中央値推移の折れ線グラフ
+- `FloorPlanDistributionChart`（Chart.js）: そのエリアの全取引を間取り別に集計した棒グラフ（件数の多い順）
+
 ### `/`（トップページ）
 
 対象地域・使用データ・主な機能（取引検索/エリア分析/AI活用、Phase2・3は「準備中」表示）・開発の問題意識を掲載し、「取引を検索する」で`/transactions`へ、「About」で`/about`へ遷移できる。
