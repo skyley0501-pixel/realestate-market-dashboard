@@ -114,6 +114,19 @@ npm run db:seed
 - `data/reinfolib/` にJSONが無い場合は何もせずメッセージを表示して終了する（DBへの書き込みは行わない）
 - 都道府県コードはAPIレスポンスに含まれないため、市区町村コード（JIS X0402）の先頭2桁から導出している
 
+## エリア統計の集計バッチ
+
+`Transaction`を市区町村×期間で集計し、`AreaStatistics`テーブルへ洗い替えする。
+
+```bash
+npm run db:aggregate
+```
+
+- 統計量（中央値・平均・四分位数）はIQR法で外れ値を除去した上で算出する（`src/features/market/domain/value-objects/price-statistics.ts`）
+- 前期比（`yoyChangeRatePercent`）は中央値を基準に算出し、直前の期間のデータが無い場合（データ収集開始直後の期間等）は`null`になる
+- 新築未完成物件は「建築年」欄に竣工予定年が入り現在年を超えることがあるが、この集計では築年自体を使わないため、その場合は築年不明として扱う
+- Prisma Clientをimportするため、他のDB操作スクリプトと同様に`tsx`経由で実行する
+
 ## API
 
 ### `GET /api/transactions`

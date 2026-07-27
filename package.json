@@ -13,6 +13,7 @@
     "db:generate": "prisma generate",
     "fetch:reinfolib": "node scripts/fetch-reinfolib.ts",
     "db:seed": "prisma db seed",
+    "db:aggregate": "tsx scripts/aggregate-area-statistics.ts",
     "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:integration": "vitest run integration"
   },

@@ -29,6 +29,7 @@ model Municipality {
   prefecture     Prefecture    @relation(fields: [prefectureCode], references: [code])
   stations       Station[]
   transactions   Transaction[]
+  areaStatistics AreaStatistics[]
 
   @@map("municipalities")
 }
@@ -73,4 +74,26 @@ model Transaction {
   @@index([transactionPeriod])
   @@index([propertyType])
   @@map("transactions")
+}
+
+// 市区町村×期間で事前集計した価格統計（IQR外れ値除去済み）。エリア一覧・詳細表示の高速化のため
+// Transactionからバッチ（scripts/aggregate-area-statistics.ts）で都度再計算して洗い替えする。
+model AreaStatistics {
+  id                    String       @id @default(cuid())
+  municipalityCode      String       @map("municipality_code")
+  municipality          Municipality @relation(fields: [municipalityCode], references: [code])
+  period                String // 例: "2024Q3"
+  medianPriceYen        BigInt       @map("median_price_yen")
+  averagePriceYen       BigInt       @map("average_price_yen")
+  q1PriceYen            BigInt       @map("q1_price_yen")
+  q3PriceYen            BigInt       @map("q3_price_yen")
+  avgUnitPriceYenPerSqm Float        @map("avg_unit_price_yen_per_sqm")
+  sampleSize            Int          @map("sample_size") // 外れ値除去後の件数
+  transactionCount      Int          @map("transaction_count") // 外れ値除去前の元の取引件数
+  yoyChangeRatePercent  Float?       @map("yoy_change_rate_percent") // 前期比。前期データが無い場合はnull
+  calculatedAt          DateTime     @default(now()) @map("calculated_at")
+
+  @@unique([municipalityCode, period])
+  @@index([period])
+  @@map("area_statistics")
 }
