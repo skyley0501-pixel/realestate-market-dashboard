@@ -7,6 +7,8 @@ export interface AreaMarketSnapshotProps {
   period: string;
   statistics: PriceStatistics;
   trendRate: TrendRate | null;
+  avgUnitPriceYenPerSqm: number;
+  transactionCount: number;
 }
 
 // エリア・対象期間・価格統計・前期比を一つの整合性単位として扱う集約。
@@ -32,5 +34,13 @@ export class AreaMarketSnapshot {
 
   get trendRate(): TrendRate | null {
     return this.props.trendRate;
+  }
+
+  get avgUnitPriceYenPerSqm(): number {
+    return this.props.avgUnitPriceYenPerSqm;
+  }
+
+  get transactionCount(): number {
+    return this.props.transactionCount;
   }
 }

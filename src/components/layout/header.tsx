@@ -3,6 +3,7 @@ import Link from "next/link";
 const NAV_LINKS = [
   { href: "/", label: "ホーム" },
   { href: "/transactions", label: "取引検索" },
+  { href: "/areas", label: "エリアランキング" },
   { href: "/about", label: "About" },
 ] as const;
 

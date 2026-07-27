@@ -6,7 +6,6 @@ import { PrismaClient } from "../src/generated/prisma/client.ts";
 import { Area } from "../src/features/market/domain/entities/area.ts";
 import { MarketStatisticsCalculator } from "../src/features/market/domain/services/market-statistics-calculator.ts";
 import type { PriceStatistics } from "../src/features/market/domain/value-objects/price-statistics.ts";
-import { UnitPrice } from "../src/features/market/domain/value-objects/unit-price.ts";
 import { BuildingAge } from "../src/features/transaction/domain/value-objects/building-age.ts";
 import { Transaction } from "../src/features/transaction/domain/entities/transaction.ts";
 import { Money } from "../src/shared/domain/value-objects/money.ts";
@@ -89,34 +88,21 @@ async function main() {
       const snapshot = calculator.calculateSnapshot(area, transactions, period, previousStatistics);
       statisticsByPeriod.set(period, snapshot.statistics);
 
-      const avgUnitPriceYenPerSqm =
-        transactions.reduce((sum, t) => sum + UnitPrice.fromTotal(t.price, t.areaSqm).perSqm, 0) /
-        transactions.length;
+      const data = {
+        medianPriceYen: snapshot.statistics.median.yen,
+        averagePriceYen: snapshot.statistics.average.yen,
+        q1PriceYen: snapshot.statistics.q1.yen,
+        q3PriceYen: snapshot.statistics.q3.yen,
+        avgUnitPriceYenPerSqm: snapshot.avgUnitPriceYenPerSqm,
+        sampleSize: snapshot.statistics.sampleSize,
+        transactionCount: snapshot.transactionCount,
+        yoyChangeRatePercent: snapshot.trendRate?.percent ?? null,
+      };
 
       await prisma.areaStatistics.upsert({
         where: { municipalityCode_period: { municipalityCode, period } },
-        create: {
-          municipalityCode,
-          period,
-          medianPriceYen: snapshot.statistics.median.yen,
-          averagePriceYen: snapshot.statistics.average.yen,
-          q1PriceYen: snapshot.statistics.q1.yen,
-          q3PriceYen: snapshot.statistics.q3.yen,
-          avgUnitPriceYenPerSqm,
-          sampleSize: snapshot.statistics.sampleSize,
-          transactionCount: transactions.length,
-          yoyChangeRatePercent: snapshot.trendRate?.percent ?? null,
-        },
-        update: {
-          medianPriceYen: snapshot.statistics.median.yen,
-          averagePriceYen: snapshot.statistics.average.yen,
-          q1PriceYen: snapshot.statistics.q1.yen,
-          q3PriceYen: snapshot.statistics.q3.yen,
-          avgUnitPriceYenPerSqm,
-          sampleSize: snapshot.statistics.sampleSize,
-          transactionCount: transactions.length,
-          yoyChangeRatePercent: snapshot.trendRate?.percent ?? null,
-        },
+        create: { municipalityCode, period, ...data },
+        update: data,
       });
       upserted += 1;
     }

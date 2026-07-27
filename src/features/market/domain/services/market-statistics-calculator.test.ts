@@ -41,6 +41,9 @@ describe("MarketStatisticsCalculator", () => {
     expect(snapshot.period).toBe("2025Q3");
     expect(snapshot.statistics.median.yen).toBe(50_000_000n);
     expect(snapshot.trendRate).toBeNull();
+    expect(snapshot.transactionCount).toBe(5);
+    // 平均価格50,000,000円 / 面積60㎡
+    expect(snapshot.avgUnitPriceYenPerSqm).toBeCloseTo(50_000_000 / 60, 3);
   });
 
   it("前期の統計量を渡すと前年（前期）同期比を算出する", () => {

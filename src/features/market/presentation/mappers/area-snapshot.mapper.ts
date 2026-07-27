@@ -13,6 +13,8 @@ export interface AreaSnapshotDto {
   q3PriceYen: string;
   sampleSize: number;
   trendRatePercent: number | null;
+  avgUnitPriceYenPerSqm: number;
+  transactionCount: number;
 }
 
 export function toAreaSnapshotDto(snapshot: AreaMarketSnapshot): AreaSnapshotDto {
@@ -28,5 +30,7 @@ export function toAreaSnapshotDto(snapshot: AreaMarketSnapshot): AreaSnapshotDto
     q3PriceYen: snapshot.statistics.q3.yen.toString(),
     sampleSize: snapshot.statistics.sampleSize,
     trendRatePercent: snapshot.trendRate?.percent ?? null,
+    avgUnitPriceYenPerSqm: snapshot.avgUnitPriceYenPerSqm,
+    transactionCount: snapshot.transactionCount,
   };
 }

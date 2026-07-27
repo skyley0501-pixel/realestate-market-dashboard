@@ -19,6 +19,8 @@ function buildSnapshot(code: string): AreaMarketSnapshot {
       100,
     ),
     trendRate: TrendRate.reconstruct(11.11),
+    avgUnitPriceYenPerSqm: 800_000,
+    transactionCount: 110,
   });
 }
 

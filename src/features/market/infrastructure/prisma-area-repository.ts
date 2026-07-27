@@ -28,7 +28,14 @@ function toSnapshot(row: AreaStatisticsRow): AreaMarketSnapshot {
   );
   const trendRate = row.yoyChangeRatePercent !== null ? TrendRate.reconstruct(row.yoyChangeRatePercent) : null;
 
-  return AreaMarketSnapshot.create({ area, period: row.period, statistics, trendRate });
+  return AreaMarketSnapshot.create({
+    area,
+    period: row.period,
+    statistics,
+    trendRate,
+    avgUnitPriceYenPerSqm: row.avgUnitPriceYenPerSqm,
+    transactionCount: row.transactionCount,
+  });
 }
 
 export class PrismaAreaRepository implements AreaRepository {

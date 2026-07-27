@@ -18,6 +18,8 @@ function buildSnapshot(code: string): AreaMarketSnapshot {
       100,
     ),
     trendRate: null,
+    avgUnitPriceYenPerSqm: 800_000,
+    transactionCount: 110,
   });
 }
 
