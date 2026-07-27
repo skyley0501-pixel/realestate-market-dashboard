@@ -100,6 +100,7 @@ npm run fetch:reinfolib -- --area 13 --quarters 4
 - `--out-dir`: 保存先ディレクトリ（デフォルト `data/reinfolib`）
 - APIキーは[APIマニュアル](https://www.reinfolib.mlit.go.jp/help/apiManual/xit001/)から利用申請し、`.env` の `REINFOLIB_API_KEY` に設定する（`.env.example` にキー名のコメント記載済み。値は各自のローカル環境で設定する）
 - APIレスポンスに最寄駅情報は含まれないため、`Transaction.stationId` 等は別途の駅名寄せ処理まではこのスクリプトの対象外
+- 国交省側のデータ公表には直近2四半期程度のタイムラグがあり、未公表の四半期はAPIが404を返す。このスクリプトは404を「未公表」として扱いスキップする（実行時に東京都で確認したところ、直近2四半期は404、その前の2四半期は取得成功だった）
 
 ## シードデータ投入
 

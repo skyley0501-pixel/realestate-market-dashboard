@@ -85,6 +85,10 @@ export async function fetchReinfolibTransactions(
   const res = await fetch(url, {
     headers: { "Ocp-Apim-Subscription-Key": apiKey },
   });
+  // 国交省側のデータ公表には直近2四半期程度のタイムラグがあり、未公表の四半期は404で返る
+  if (res.status === 404) {
+    return [];
+  }
   if (!res.ok) {
     throw new Error(`reinfolib API error: ${res.status} ${res.statusText} (${url})`);
   }
@@ -174,6 +178,10 @@ async function main() {
   for (const q of quarters) {
     console.log(`取得中: area=${options.area} year=${q.year} quarter=${q.quarter}`);
     const records = await fetchReinfolibTransactions({ ...q, area: options.area }, apiKey);
+    if (records.length === 0) {
+      console.log(`  -> データ未公開のためスキップ（国交省側の公表タイムラグ）`);
+      continue;
+    }
     const outFile = path.join(options.outDir, `${options.area}_${q.year}Q${q.quarter}.json`);
     await writeFile(outFile, JSON.stringify(records, null, 2), "utf-8");
     console.log(`  -> ${records.length}件を ${outFile} に保存`);
