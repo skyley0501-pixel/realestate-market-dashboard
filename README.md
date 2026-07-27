@@ -161,6 +161,28 @@ curl "http://localhost:3000/api/transactions/<id>"
 # => 200 {"data":{...}}  / 存在しないIDなら 404 {"error":{"code":"TRANSACTION_NOT_FOUND",...}}
 ```
 
+### `GET /api/areas`
+
+エリア一覧。各市区町村の最新期間（集計バッチ実行時点で最新のperiod）の統計スナップショットを返す。クエリパラメータなし。
+
+```bash
+curl "http://localhost:3000/api/areas"
+# => {"data":[{"code":"13102","name":"中央区","period":"2025Q4","medianPriceYen":"100000000","averagePriceYen":"107239075","q1PriceYen":"57000000","q3PriceYen":"150000000","sampleSize":389,"trendRatePercent":0},...]}
+```
+
+- 金額（`medianPriceYen`等）はJSONがbigintを扱えないため文字列で返す
+- `trendRatePercent`は中央値ベースの前期比（%）。前期データが無い場合は`null`
+- `AreaStatistics`は手動実行の集計バッチ（`npm run db:aggregate`）でのみ更新されるため、`Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400`を設定
+
+### `GET /api/areas/:code`
+
+エリア詳細（市区町村コード指定）。存在しないコードの場合は404（`AREA_NOT_FOUND`）を返す。
+
+```bash
+curl "http://localhost:3000/api/areas/13101"
+# => 200 {"data":{"code":"13101","name":"千代田区",...}}  / 存在しないコードなら 404 {"error":{"code":"AREA_NOT_FOUND",...}}
+```
+
 ## ページ
 
 ### `/transactions`
