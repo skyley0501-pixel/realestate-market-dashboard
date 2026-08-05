@@ -90,4 +90,11 @@ describe("PrismaAreaRepository (integration)", () => {
     expect(history[0]?.trendRate).toBeNull();
     expect(history[1]?.trendRate?.percent).toBeCloseTo(11.111, 3);
   });
+
+  it("findSnapshotHistoryByCodesは複数エリアの全期間スナップショットをコード・期間昇順で返す", async () => {
+    const history = await repository.findSnapshotHistoryByCodes([testMunicipalityCode, "non-existent-code"]);
+
+    expect(history.map((s) => s.area.code)).toEqual([testMunicipalityCode, testMunicipalityCode]);
+    expect(history.map((s) => s.period)).toEqual([previousPeriod, latestPeriod]);
+  });
 });

@@ -8,4 +8,6 @@ export interface AreaRepository {
   findLatestSnapshotByCode(code: string): Promise<AreaMarketSnapshot | null>;
   // 指定エリアの全期間のスナップショットを期間昇順で返す（価格推移グラフ用）
   findSnapshotHistoryByCode(code: string): Promise<AreaMarketSnapshot[]>;
+  // 複数エリアの全期間のスナップショットをエリアコード・期間昇順で返す（トレンド比較グラフ用）
+  findSnapshotHistoryByCodes(codes: string[]): Promise<AreaMarketSnapshot[]>;
 }

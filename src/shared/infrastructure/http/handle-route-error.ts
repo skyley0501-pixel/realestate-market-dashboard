@@ -6,6 +6,7 @@ const STATUS_MAP: Record<string, number> = {
   VALIDATION_ERROR: 400,
   TRANSACTION_NOT_FOUND: 404,
   AREA_NOT_FOUND: 404,
+  TREND_INVALID_CODES: 400,
 };
 
 export function handleRouteError(error: ApplicationError, requestId: string): NextResponse {
