@@ -10,21 +10,9 @@ import {
   Tooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { seriesColor } from "../../lib/chart-colors";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
-
-// dataviz skillの検証済みカテゴリカルパレット（8色、隣接ペアでCVD/通常視差のfloorをクリア）。
-// 3系列を超えると全ペア検証は通らないため、選択上限は呼び出し側（AreaSelector）で8に制限する。
-const SERIES_COLORS = [
-  "#2a78d6", // blue
-  "#eb6834", // orange
-  "#1baf7a", // aqua
-  "#eda100", // yellow
-  "#e87ba4", // magenta
-  "#008300", // green
-  "#4a3aa7", // violet
-  "#e34948", // red
-];
 
 export interface TrendSeries {
   code: string;
@@ -41,7 +29,7 @@ export function TrendComparisonChart({ series }: TrendComparisonChartProps) {
   const labels = [...new Set(series.flatMap((s) => s.points.map((p) => p.period)))].sort();
 
   const datasets = series.map((s, index) => {
-    const color = SERIES_COLORS[index % SERIES_COLORS.length];
+    const color = seriesColor(index);
     const valueByPeriod = new Map(s.points.map((p) => [p.period, p.medianPriceYen]));
     return {
       label: s.label,

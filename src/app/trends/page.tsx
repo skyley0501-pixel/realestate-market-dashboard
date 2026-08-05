@@ -1,6 +1,6 @@
 import { marketContainer } from "@/features/market/infrastructure/container";
-import { AreaTrendSelector } from "@/features/market/presentation/components/AreaTrendSelector";
-import { MIN_TREND_AREAS } from "@/features/market/presentation/lib/trend-selection";
+import { AreaMultiSelector } from "@/features/market/presentation/components/AreaMultiSelector";
+import { MAX_TREND_AREAS, MIN_TREND_AREAS } from "@/features/market/presentation/lib/trend-selection";
 import { toAreaSnapshotDto } from "@/features/market/presentation/mappers/area-snapshot.mapper";
 import type { AreaMarketSnapshot } from "@/features/market/domain/aggregates/area-market-snapshot";
 import { TrendComparisonChart, type TrendSeries } from "@/shared/ui/components/charts/TrendComparisonChart";
@@ -51,7 +51,7 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">トレンド分析</h1>
 
-      <AreaTrendSelector areas={areas} selectedCodes={codes} />
+      <AreaMultiSelector areas={areas} selectedCodes={codes} min={MIN_TREND_AREAS} max={MAX_TREND_AREAS} href="/trends" />
 
       {trendsResult &&
         trendsResult.match(

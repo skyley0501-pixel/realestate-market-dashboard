@@ -5,6 +5,7 @@ const NAV_LINKS = [
   { href: "/transactions", label: "取引検索" },
   { href: "/areas", label: "エリアランキング" },
   { href: "/trends", label: "トレンド分析" },
+  { href: "/areas/compare", label: "エリア比較" },
   { href: "/about", label: "About" },
 ] as const;
 

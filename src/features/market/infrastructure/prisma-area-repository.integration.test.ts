@@ -97,4 +97,12 @@ describe("PrismaAreaRepository (integration)", () => {
     expect(history.map((s) => s.area.code)).toEqual([testMunicipalityCode, testMunicipalityCode]);
     expect(history.map((s) => s.period)).toEqual([previousPeriod, latestPeriod]);
   });
+
+  it("findLatestSnapshotsByCodesは指定エリアの最新期間のスナップショットのみを返す", async () => {
+    const snapshots = await repository.findLatestSnapshotsByCodes([testMunicipalityCode, "non-existent-code"]);
+
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0]?.area.code).toBe(testMunicipalityCode);
+    expect(snapshots[0]?.period).toBe(latestPeriod);
+  });
 });

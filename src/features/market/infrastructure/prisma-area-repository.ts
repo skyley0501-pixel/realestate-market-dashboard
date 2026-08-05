@@ -80,4 +80,16 @@ export class PrismaAreaRepository implements AreaRepository {
     });
     return rows.map(toSnapshot);
   }
+
+  async findLatestSnapshotsByCodes(codes: string[]): Promise<AreaMarketSnapshot[]> {
+    const latest = await this.prisma.areaStatistics.aggregate({ _max: { period: true } });
+    const latestPeriod = latest._max.period;
+    if (!latestPeriod) return [];
+
+    const rows = await this.prisma.areaStatistics.findMany({
+      where: { municipalityCode: { in: codes }, period: latestPeriod },
+      include: { municipality: { include: { prefecture: true } } },
+    });
+    return rows.map(toSnapshot);
+  }
 }
