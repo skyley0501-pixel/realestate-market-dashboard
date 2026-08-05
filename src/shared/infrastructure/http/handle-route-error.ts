@@ -8,6 +8,7 @@ const STATUS_MAP: Record<string, number> = {
   AREA_NOT_FOUND: 404,
   TREND_INVALID_CODES: 400,
   COMPARE_INVALID_CODES: 400,
+  HEATMAP_INVALID_GRANULARITY: 400,
 };
 
 export function handleRouteError(error: ApplicationError, requestId: string): NextResponse {
