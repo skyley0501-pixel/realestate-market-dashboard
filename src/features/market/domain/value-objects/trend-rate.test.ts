@@ -20,10 +20,24 @@ describe("TrendRate", () => {
   it("前期と変化が無ければ変化率は0", () => {
     const rate = TrendRate.calculate(Money.fromYen(30_000_000), Money.fromYen(30_000_000));
     expect(rate.percent).toBe(0);
+    expect(rate.isIncrease).toBe(false);
+    expect(rate.isDecrease).toBe(false);
   });
 
   it("前期の価格が0円の場合はZeroBasePriceErrorを投げる", () => {
     expect(() => TrendRate.calculate(Money.fromYen(1000), Money.fromYen(0))).toThrow(ZeroBasePriceError);
+  });
+
+  it("当期の価格が0円の場合、変化率は-100%になる", () => {
+    const rate = TrendRate.calculate(Money.fromYen(0), Money.fromYen(30_000_000));
+    expect(rate.percent).toBe(-100);
+    expect(rate.isDecrease).toBe(true);
+  });
+
+  it("価格が10倍に高騰した場合、変化率は900%になる", () => {
+    const rate = TrendRate.calculate(Money.fromYen(100_000_000), Money.fromYen(10_000_000));
+    expect(rate.percent).toBe(900);
+    expect(rate.isIncrease).toBe(true);
   });
 
   it("reconstructは渡された変化率をそのまま保持する", () => {
