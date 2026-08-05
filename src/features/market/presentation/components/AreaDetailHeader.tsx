@@ -1,14 +1,6 @@
 import type { AreaSnapshotDto } from "../mappers/area-snapshot.mapper";
 import { formatTrendText, formatTsuboPrice, formatYen, trendColorClass } from "../lib/format";
-
-function StatCard({ label, value, valueClassName }: { label: string; value: string; valueClassName?: string }) {
-  return (
-    <div className="rounded-lg border p-4">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className={`text-xl font-semibold ${valueClassName ?? ""}`}>{value}</p>
-    </div>
-  );
-}
+import { StatCard } from "./StatCard";
 
 export function AreaDetailHeader({ area }: { area: AreaSnapshotDto }) {
   return (

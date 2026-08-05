@@ -1,9 +1,9 @@
 import { marketContainer } from "@/features/market/infrastructure/container";
 import { AreaMultiSelector } from "@/features/market/presentation/components/AreaMultiSelector";
+import { groupByArea } from "@/features/market/presentation/lib/trend-grouping";
 import { MAX_TREND_AREAS, MIN_TREND_AREAS } from "@/features/market/presentation/lib/trend-selection";
 import { toAreaSnapshotDto } from "@/features/market/presentation/mappers/area-snapshot.mapper";
-import type { AreaMarketSnapshot } from "@/features/market/domain/aggregates/area-market-snapshot";
-import { TrendComparisonChart, type TrendSeries } from "@/shared/ui/components/charts/TrendComparisonChart";
+import { TrendComparisonChart } from "@/shared/ui/components/charts/TrendComparisonChart";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -13,25 +13,6 @@ function parseCodes(value: string | string[] | undefined): string[] {
     .split(",")
     .map((code) => code.trim())
     .filter(Boolean);
-}
-
-function groupByArea(history: AreaMarketSnapshot[]): TrendSeries[] {
-  const seriesByCode = new Map<string, TrendSeries>();
-  for (const snapshot of history) {
-    const dto = toAreaSnapshotDto(snapshot);
-    const point = { period: dto.period, medianPriceYen: Number(dto.medianPriceYen) };
-    const existing = seriesByCode.get(dto.code);
-    if (existing) {
-      existing.points.push(point);
-    } else {
-      seriesByCode.set(dto.code, {
-        code: dto.code,
-        label: `${dto.prefectureName}${dto.name}`,
-        points: [point],
-      });
-    }
-  }
-  return [...seriesByCode.values()];
 }
 
 export default async function TrendsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {

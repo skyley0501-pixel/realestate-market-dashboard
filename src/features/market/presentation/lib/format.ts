@@ -1,7 +1,7 @@
 const SQM_PER_TSUBO = 3.30578;
 
-export function formatYen(priceYen: string): string {
-  return `${BigInt(priceYen).toLocaleString("ja-JP")}円`;
+export function formatYen(priceYen: string | number): string {
+  return `${BigInt(Math.round(Number(priceYen))).toLocaleString("ja-JP")}円`;
 }
 
 export function formatTsuboPrice(avgUnitPriceYenPerSqm: number): string {
