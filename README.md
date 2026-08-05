@@ -9,7 +9,14 @@
 - ✅ 国交省API取り込み基盤完成
 - ✅ Clean Architecture × DDD基盤完成
 
-🚀 次は分析機能・AI活用（Phase2）
+## 🎉 Phase2 Completed（Day19〜32）
+
+- ✅ エリア分析（統計サマリー・価格推移・間取り分布）
+- ✅ トレンド分析（複数エリア比較）・エリア比較（レーダーチャート）
+- ✅ MapLibre GLによるマーケットマップ（市区町村境界＋坪単価ヒートマップ）
+- ✅ `/dashboard`（主要統計・トレンド・地図の1画面統合）
+
+🚀 次はAI機能（Phase3）
 
 - 公開URL: https://realestate-market-dashboard.vercel.app/（現時点では実データ未投入のため一覧は空の状態）
 - 要件定義: [`docs/requirements.md`](./docs/requirements.md)
