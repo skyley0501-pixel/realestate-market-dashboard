@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { href: "/areas", label: "エリアランキング" },
   { href: "/trends", label: "トレンド分析" },
   { href: "/areas/compare", label: "エリア比較" },
+  { href: "/map", label: "マーケットマップ" },
   { href: "/about", label: "About" },
 ] as const;
 

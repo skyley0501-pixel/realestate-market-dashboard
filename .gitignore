@@ -43,6 +43,10 @@ next-env.d.ts
 
 /src/generated/prisma
 
+# maplibre-glのworkerバンドル（scripts/copy-maplibre-workerがpostinstallでnode_modulesから生成）
+/public/maplibre-gl-worker.mjs
+/public/maplibre-gl-shared.mjs
+
 # reinfolib API 取得結果（生データ、クレンジング前）
 /data/reinfolib
 
