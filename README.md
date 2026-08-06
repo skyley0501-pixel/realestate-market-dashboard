@@ -83,7 +83,7 @@ npm run db:aggregate
 | `/areas` | 市区町村別ランキング |
 | `/areas/[code]` | エリア詳細と価格推移・間取り分布 |
 | `/trends` | 複数エリアの時系列比較 |
-| `/compare` | エリア比較 |
+| `/areas/compare` | エリア比較 |
 | `/map` | 坪単価ヒートマップ |
 
 ## 開発状況
