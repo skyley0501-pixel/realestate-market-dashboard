@@ -56,3 +56,8 @@ next-env.d.ts
 
 # GPTレビュー保存先（開発中の内部メモ、非公開）
 /docs/reviews
+
+# AIコーディングツール向けの自動生成スキル/ドキュメント（Prisma等が生成、実装コードと無関係）
+/.agents
+/.claude
+/.windsurf
