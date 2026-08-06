@@ -52,8 +52,11 @@ setWorkerUrl("/maplibre-gl-worker.mjs");
 
 async function fetchHeatmapCells(granularity: Granularity): Promise<HeatmapCell[]> {
   const res = await fetch(`/api/map/heatmap?granularity=${granularity}`);
-  const json = await res.json();
-  return json.data as HeatmapCell[];
+  if (!res.ok) {
+    throw new Error(`ヒートマップデータの取得に失敗しました: ${res.status}`);
+  }
+  const json: { data: HeatmapCell[] } = await res.json();
+  return json.data;
 }
 
 export function MarketMap() {
