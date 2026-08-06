@@ -12,6 +12,12 @@
 - マーケットマップ: MapLibre GLによる市区町村境界と坪単価ヒートマップ
 - 統合ダッシュボード: 主要指標、トレンド、ランキング、地図を1画面に集約
 
+## スクリーンショット
+
+| 統合ダッシュボード | 坪単価ヒートマップ | エリア比較（レーダーチャート） |
+|---|---|---|
+| ![統合ダッシュボード](./docs/images/dashboard.jpg) | ![坪単価ヒートマップ](./docs/images/heatmap.jpg) | ![エリア比較](./docs/images/area-comparison.jpg) |
+
 ## 技術的な特徴
 
 - **Feature First × Clean Architecture × DDD**: 機能単位でdomain / application / infrastructure / presentationを分離
