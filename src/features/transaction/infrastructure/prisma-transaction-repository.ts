@@ -8,12 +8,18 @@ import type {
 import { BuildingAge } from "../domain/value-objects/building-age";
 import { FloorPlan } from "../domain/value-objects/floor-plan";
 
-type TransactionRow = Awaited<ReturnType<PrismaClient["transaction"]["findFirstOrThrow"]>>;
+const MUNICIPALITY_INCLUDE = { municipality: { include: { prefecture: true } } } as const;
+
+type TransactionRow = Awaited<ReturnType<PrismaClient["transaction"]["findFirstOrThrow"]>> & {
+  municipality?: { name: string; prefecture: { name: string } } | null;
+};
 
 function toEntity(row: TransactionRow): Transaction {
   return Transaction.create({
     id: row.id,
     municipalityCode: row.municipalityCode,
+    municipalityName: row.municipality?.name ?? null,
+    prefectureName: row.municipality?.prefecture.name ?? null,
     stationId: row.stationId,
     transactionPeriod: row.transactionPeriod,
     propertyType: row.propertyType,
@@ -45,7 +51,10 @@ export class PrismaTransactionRepository implements TransactionRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async findById(id: string): Promise<Transaction | null> {
-    const row = await this.prisma.transaction.findUnique({ where: { id } });
+    const row = await this.prisma.transaction.findUnique({
+      where: { id },
+      include: MUNICIPALITY_INCLUDE,
+    });
     return row ? toEntity(row) : null;
   }
 
@@ -55,6 +64,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
       take: criteria.limit,
       skip: criteria.offset,
       orderBy: { transactionPeriod: "desc" },
+      include: MUNICIPALITY_INCLUDE,
     });
     return rows.map(toEntity);
   }

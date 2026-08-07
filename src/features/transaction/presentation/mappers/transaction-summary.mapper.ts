@@ -4,6 +4,8 @@ import type { Transaction } from "../../domain/entities/transaction";
 export interface TransactionSummaryDto {
   id: string;
   municipalityCode: string;
+  municipalityName: string | null;
+  prefectureName: string | null;
   stationId: string | null;
   transactionPeriod: string;
   propertyType: string;
@@ -20,6 +22,8 @@ export function toTransactionSummary(transaction: Transaction): TransactionSumma
   return {
     id: transaction.id,
     municipalityCode: transaction.municipalityCode,
+    municipalityName: transaction.municipalityName,
+    prefectureName: transaction.prefectureName,
     stationId: transaction.stationId,
     transactionPeriod: transaction.transactionPeriod,
     propertyType: transaction.propertyType,

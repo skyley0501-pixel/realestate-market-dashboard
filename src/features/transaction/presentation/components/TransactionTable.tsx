@@ -27,7 +27,7 @@ export function TransactionTable({ transactions }: { transactions: TransactionSu
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>市区町村コード</TableHead>
+          <TableHead>エリア</TableHead>
           <TableHead>種類</TableHead>
           <TableHead>間取り</TableHead>
           <TableHead>面積</TableHead>
@@ -40,7 +40,9 @@ export function TransactionTable({ transactions }: { transactions: TransactionSu
           <TableRow key={transaction.id}>
             <TableCell>
               <Link href={`/transactions/${transaction.id}`} className="hover:underline">
-                {transaction.municipalityCode}
+                {transaction.prefectureName && transaction.municipalityName
+                  ? `${transaction.prefectureName}${transaction.municipalityName}`
+                  : transaction.municipalityCode}
               </Link>
             </TableCell>
             <TableCell>

@@ -14,6 +14,9 @@ export class InvalidTransactionAreaError extends DomainError {
 export interface TransactionProps {
   id: string;
   municipalityCode: string;
+  // 検索結果の表示用（Repositoryが市区町村マスタと結合できた場合のみ設定される）。集計バッチ等では未設定でよい
+  municipalityName?: string | null;
+  prefectureName?: string | null;
   stationId: string | null;
   transactionPeriod: string;
   propertyType: string;
@@ -43,6 +46,14 @@ export class Transaction {
 
   get municipalityCode(): string {
     return this.props.municipalityCode;
+  }
+
+  get municipalityName(): string | null {
+    return this.props.municipalityName ?? null;
+  }
+
+  get prefectureName(): string | null {
+    return this.props.prefectureName ?? null;
   }
 
   get stationId(): string | null {
