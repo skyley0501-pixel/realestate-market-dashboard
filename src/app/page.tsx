@@ -37,7 +37,9 @@ export default function Home() {
         </div>
         <p className="mt-8 font-mono text-sm tracking-widest text-muted-foreground">REMDA / REAL ESTATE MARKET DATA</p>
         <h1 className="mt-3 max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
-          首都圏の不動産市場を、取引・統計・地図から読む。
+          首都圏の不動産市場を、
+          <br />
+          取引/統計/地図から読む。
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
           {TARGET_AREAS.join("・")}を対象に、取引検索から市区町村別の価格推移、比較、ヒートマップまでを一つにまとめた市場分析ダッシュボードです。
