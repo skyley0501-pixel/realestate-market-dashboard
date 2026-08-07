@@ -96,6 +96,16 @@ export async function fetchReinfolibTransactions(
   return body.data ?? [];
 }
 
+// 指定都市（横浜市・川崎市等）はワード単位（例: "横浜市鶴見区"）で返るため、市区町村名の前方一致で
+// 対象都市（そのワードすべて）を拾う。対象未指定（空配列）の場合はフィルタしない。
+export function filterByTargetCities(
+  records: ReinfolibTransactionRecord[],
+  targetCities: string[],
+): ReinfolibTransactionRecord[] {
+  if (targetCities.length === 0) return records;
+  return records.filter((r) => targetCities.some((city) => r.Municipality?.startsWith(city)));
+}
+
 // 現在日時を基準に、直近count四半期分の {year, quarter} を新しい順で返す（進行中の四半期は含めない）
 export function getRecentQuarters(
   count: number,
@@ -126,6 +136,7 @@ interface CliOptions {
   quarters: number;
   dryRun: boolean;
   outDir: string;
+  cities: string[];
 }
 
 function parseCliArgs(argv: string[]): CliOptions {
@@ -134,6 +145,7 @@ function parseCliArgs(argv: string[]): CliOptions {
     quarters: 4,
     dryRun: false,
     outDir: path.join(process.cwd(), "data", "reinfolib"),
+    cities: [],
   };
   for (let i = 0; i < argv.length; i++) {
     switch (argv[i]) {
@@ -148,6 +160,9 @@ function parseCliArgs(argv: string[]): CliOptions {
         break;
       case "--out-dir":
         options.outDir = argv[++i];
+        break;
+      case "--cities":
+        options.cities = argv[++i].split(",").filter((c) => c.length > 0);
         break;
     }
   }
@@ -177,9 +192,17 @@ async function main() {
 
   for (const q of quarters) {
     console.log(`取得中: area=${options.area} year=${q.year} quarter=${q.quarter}`);
-    const records = await fetchReinfolibTransactions({ ...q, area: options.area }, apiKey);
-    if (records.length === 0) {
+    const fetched = await fetchReinfolibTransactions({ ...q, area: options.area }, apiKey);
+    if (fetched.length === 0) {
       console.log(`  -> データ未公開のためスキップ（国交省側の公表タイムラグ）`);
+      continue;
+    }
+    const records = filterByTargetCities(fetched, options.cities);
+    if (options.cities.length > 0) {
+      console.log(`  -> 取得${fetched.length}件中、対象市区町村（${options.cities.join("/")}）は${records.length}件`);
+    }
+    if (records.length === 0) {
+      console.log(`  -> 対象市区町村の取引が無いためスキップ`);
       continue;
     }
     const outFile = path.join(options.outDir, `${options.area}_${q.year}Q${q.quarter}.json`);

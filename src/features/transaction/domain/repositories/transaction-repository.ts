@@ -7,6 +7,10 @@ export interface TransactionSearchCriteria {
   floorPlan?: string;
   minPrice?: Money;
   maxPrice?: Money;
+  minAreaSqm?: number;
+  maxAreaSqm?: number; // 上限は含まない（〜未満）
+  minBuildingYear?: number;
+  maxBuildingYear?: number;
   limit?: number;
   offset?: number;
 }
@@ -16,4 +20,5 @@ export interface TransactionRepository {
   findById(id: string): Promise<Transaction | null>;
   search(criteria: TransactionSearchCriteria): Promise<Transaction[]>;
   count(criteria: TransactionSearchCriteria): Promise<number>;
+  findDistinctFloorPlans(): Promise<string[]>;
 }

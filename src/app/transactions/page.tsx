@@ -1,4 +1,8 @@
 import { Button } from "@/components/ui/button";
+import {
+  findAreaSqmRange,
+  findBuildingAgeRange,
+} from "@/features/transaction/domain/constants/transaction-search-filters";
 import { transactionContainer } from "@/features/transaction/infrastructure/container";
 import { TransactionFilterPanel } from "@/features/transaction/presentation/components/TransactionFilterPanel";
 import { TransactionTable } from "@/features/transaction/presentation/components/TransactionTable";
@@ -54,8 +58,24 @@ export default async function TransactionsPage({
   const floorPlan = parseOptionalString(params.floorPlan);
   const minPrice = parseOptionalPositiveInt(params.minPrice);
   const maxPrice = parseOptionalPositiveInt(params.maxPrice);
+
+  const areaSqmRange = findAreaSqmRange(parseOptionalString(params.areaSqmRange) ?? "");
+  const buildingAgeRange = findBuildingAgeRange(parseOptionalString(params.buildingAgeRange) ?? "");
+  // 築年数（経過年数）の範囲は、実行時点の年からbuildingYear（西暦）の範囲に変換して検索する
+  const currentYear = new Date().getFullYear();
+  const minBuildingYear =
+    buildingAgeRange?.maxBuildingAgeYears !== undefined ? currentYear - buildingAgeRange.maxBuildingAgeYears : undefined;
+  const maxBuildingYear =
+    buildingAgeRange?.minBuildingAgeYears !== undefined ? currentYear - buildingAgeRange.minBuildingAgeYears : undefined;
+
   const hasAnyFilter = Boolean(
-    municipalityCode || propertyType || floorPlan || minPrice !== undefined || maxPrice !== undefined,
+    municipalityCode ||
+      propertyType ||
+      floorPlan ||
+      minPrice !== undefined ||
+      maxPrice !== undefined ||
+      areaSqmRange ||
+      buildingAgeRange,
   );
 
   const result = hasAnyFilter
@@ -65,6 +85,10 @@ export default async function TransactionsPage({
         floorPlan,
         minPrice: minPrice !== undefined ? Money.fromYen(minPrice) : undefined,
         maxPrice: maxPrice !== undefined ? Money.fromYen(maxPrice) : undefined,
+        minAreaSqm: areaSqmRange?.minAreaSqm,
+        maxAreaSqm: areaSqmRange?.maxAreaSqm,
+        minBuildingYear,
+        maxBuildingYear,
         limit: PAGE_SIZE + 1,
         offset,
       })

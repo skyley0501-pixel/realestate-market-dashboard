@@ -12,10 +12,7 @@ export function Header() {
     <header className="border-b">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:h-14 sm:py-0">
         <Link href="/" className="whitespace-nowrap font-semibold">
-          <span className="hidden sm:inline">
-            首都圏不動産マーケットダッシュボード
-          </span>
-          <span className="sm:hidden">不動産ダッシュボード</span>
+          REMDA
         </Link>
         <nav aria-label="メインナビゲーション">
           <ul className="flex items-center gap-4 text-sm">

@@ -44,6 +44,18 @@ function buildWhere(criteria: TransactionSearchCriteria): Prisma.TransactionWher
       ...(criteria.maxPrice ? { lte: criteria.maxPrice.yen } : {}),
     };
   }
+  if (criteria.minAreaSqm !== undefined || criteria.maxAreaSqm !== undefined) {
+    where.areaSqm = {
+      ...(criteria.minAreaSqm !== undefined ? { gte: criteria.minAreaSqm } : {}),
+      ...(criteria.maxAreaSqm !== undefined ? { lt: criteria.maxAreaSqm } : {}),
+    };
+  }
+  if (criteria.minBuildingYear !== undefined || criteria.maxBuildingYear !== undefined) {
+    where.buildingYear = {
+      ...(criteria.minBuildingYear !== undefined ? { gte: criteria.minBuildingYear } : {}),
+      ...(criteria.maxBuildingYear !== undefined ? { lte: criteria.maxBuildingYear } : {}),
+    };
+  }
   return where;
 }
 
@@ -71,5 +83,15 @@ export class PrismaTransactionRepository implements TransactionRepository {
 
   async count(criteria: TransactionSearchCriteria): Promise<number> {
     return this.prisma.transaction.count({ where: buildWhere(criteria) });
+  }
+
+  async findDistinctFloorPlans(): Promise<string[]> {
+    const rows = await this.prisma.transaction.groupBy({
+      by: ["floorPlan"],
+      where: { floorPlan: { not: null } },
+      _count: true,
+      orderBy: { _count: { floorPlan: "desc" } },
+    });
+    return rows.map((row) => row.floorPlan as string);
   }
 }

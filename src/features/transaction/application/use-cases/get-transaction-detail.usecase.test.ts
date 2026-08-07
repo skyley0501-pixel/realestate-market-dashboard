@@ -28,6 +28,7 @@ function buildMockRepository(overrides: Partial<TransactionRepository> = {}): Tr
     findById: vi.fn(),
     search: vi.fn(),
     count: vi.fn(),
+    findDistinctFloorPlans: vi.fn(),
     ...overrides,
   };
 }

@@ -11,6 +11,8 @@ export const TransactionFilterFormSchema = z.object({
   municipalityCode: z.string().optional(),
   propertyType: z.string().optional(),
   floorPlan: z.string().optional(),
+  buildingAgeRange: z.string().optional(),
+  areaSqmRange: z.string().optional(),
   minPrice: optionalNumericString,
   maxPrice: optionalNumericString,
 });
