@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { groupAreasByPrefecture } from "../lib/area-grouping";
 import type { AreaSnapshotDto } from "../mappers/area-snapshot.mapper";
 
 export interface AreaMultiSelectorProps {
@@ -15,33 +16,15 @@ export interface AreaMultiSelectorProps {
   href: string; // 選択確定後の遷移先ベースパス（?codes=... を付与する）
 }
 
-// 対象4都県の表示順（データベースの内容によらず変動しないマスタのため定数として持つ）
-const PREFECTURE_ORDER = ["13", "14", "12", "11"];
-
-interface PrefectureGroup {
-  prefectureCode: string;
-  prefectureName: string;
-  areas: AreaSnapshotDto[];
-}
-
-function groupByPrefecture(areas: AreaSnapshotDto[]): PrefectureGroup[] {
-  const groups = new Map<string, PrefectureGroup>();
-  for (const area of areas) {
-    const group = groups.get(area.prefectureCode);
-    if (group) {
-      group.areas.push(area);
-    } else {
-      groups.set(area.prefectureCode, { prefectureCode: area.prefectureCode, prefectureName: area.prefectureName, areas: [area] });
-    }
-  }
-  const orderedCodes = [...PREFECTURE_ORDER, ...[...groups.keys()].filter((code) => !PREFECTURE_ORDER.includes(code))];
-  return orderedCodes.map((code) => groups.get(code)).filter((group): group is PrefectureGroup => group !== undefined);
+// サブグループ見出し（例:「横浜市」）と重複する市区町村名の先頭部分は表示上省略する
+function areaDisplayName(area: AreaSnapshotDto, subGroupLabel: string): string {
+  return area.name.startsWith(subGroupLabel) ? area.name.slice(subGroupLabel.length) : area.name;
 }
 
 export function AreaMultiSelector({ areas, selectedCodes, min, max, href }: AreaMultiSelectorProps) {
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>(selectedCodes);
-  const groups = groupByPrefecture(areas);
+  const groups = groupAreasByPrefecture(areas);
 
   function toggle(code: string, checked: boolean) {
     setSelected((prev) => {
@@ -69,25 +52,30 @@ export function AreaMultiSelector({ areas, selectedCodes, min, max, href }: Area
       {groups.map((group) => (
         <div key={group.prefectureCode} className="mb-4 last:mb-0">
           <h3 className="mb-2 text-sm font-semibold text-muted-foreground">{group.prefectureName}</h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {group.areas.map((area) => {
-              const checked = selected.includes(area.code);
-              const disabled = !checked && selected.length >= max;
-              return (
-                <div key={area.code} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`area-${area.code}`}
-                    checked={checked}
-                    disabled={disabled}
-                    onCheckedChange={(next) => toggle(area.code, next)}
-                  />
-                  <Label htmlFor={`area-${area.code}`} className="font-normal">
-                    {area.name}
-                  </Label>
-                </div>
-              );
-            })}
-          </div>
+          {group.subGroups.map((subGroup) => (
+            <div key={subGroup.label} className="mb-3 pl-3 last:mb-0">
+              <h4 className="mb-2 text-xs text-muted-foreground">{subGroup.label}</h4>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {subGroup.areas.map((area) => {
+                  const checked = selected.includes(area.code);
+                  const disabled = !checked && selected.length >= max;
+                  return (
+                    <div key={area.code} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`area-${area.code}`}
+                        checked={checked}
+                        disabled={disabled}
+                        onCheckedChange={(next) => toggle(area.code, next)}
+                      />
+                      <Label htmlFor={`area-${area.code}`} className="font-normal">
+                        {areaDisplayName(area, subGroup.label)}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       ))}
       <Button className="mt-4" onClick={apply} disabled={!canApply}>
