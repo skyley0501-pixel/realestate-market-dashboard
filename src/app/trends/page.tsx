@@ -1,23 +1,14 @@
 import { marketContainer } from "@/features/market/infrastructure/container";
 import { AreaMultiSelector } from "@/features/market/presentation/components/AreaMultiSelector";
 import { groupByArea } from "@/features/market/presentation/lib/trend-grouping";
+import { parseCodesParam, type SearchParams } from "@/features/market/presentation/lib/search-params";
 import { MAX_TREND_AREAS, MIN_TREND_AREAS } from "@/features/market/presentation/lib/trend-selection";
 import { toAreaSnapshotDto } from "@/features/market/presentation/mappers/area-snapshot.mapper";
 import { TrendComparisonChart } from "@/shared/ui/components/charts/TrendComparisonChart";
 
-type SearchParams = Record<string, string | string[] | undefined>;
-
-function parseCodes(value: string | string[] | undefined): string[] {
-  const v = Array.isArray(value) ? value[0] : value;
-  return (v ?? "")
-    .split(",")
-    .map((code) => code.trim())
-    .filter(Boolean);
-}
-
 export default async function TrendsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
-  const codes = parseCodes(params.codes);
+  const codes = parseCodesParam(params.codes);
 
   const areasResult = await marketContainer.getListAreasUseCase().execute();
   const areas = areasResult.match(

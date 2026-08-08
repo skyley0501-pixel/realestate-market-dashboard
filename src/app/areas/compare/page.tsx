@@ -1,18 +1,9 @@
 import { CompareAreasUseCase, MAX_COMPARE_AREAS, MIN_COMPARE_AREAS } from "@/features/market/application/use-cases/compare-areas.usecase";
 import { marketContainer } from "@/features/market/infrastructure/container";
 import { AreaMultiSelector } from "@/features/market/presentation/components/AreaMultiSelector";
+import { parseCodesParam, type SearchParams } from "@/features/market/presentation/lib/search-params";
 import { toAreaSnapshotDto } from "@/features/market/presentation/mappers/area-snapshot.mapper";
 import { AreaComparisonView, type AreaComparisonMetrics } from "@/shared/ui/components/charts/AreaComparisonView";
-
-type SearchParams = Record<string, string | string[] | undefined>;
-
-function parseCodes(value: string | string[] | undefined): string[] {
-  const v = Array.isArray(value) ? value[0] : value;
-  return (v ?? "")
-    .split(",")
-    .map((code) => code.trim())
-    .filter(Boolean);
-}
 
 function toComparisonMetrics(dto: ReturnType<typeof toAreaSnapshotDto>): AreaComparisonMetrics {
   return {
@@ -27,7 +18,7 @@ function toComparisonMetrics(dto: ReturnType<typeof toAreaSnapshotDto>): AreaCom
 
 export default async function AreaComparePage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
-  const codes = parseCodes(params.codes);
+  const codes = parseCodesParam(params.codes);
 
   const areasResult = await marketContainer.getListAreasUseCase().execute();
   const areas = areasResult.match(

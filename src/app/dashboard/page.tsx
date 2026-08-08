@@ -1,29 +1,39 @@
 import { marketContainer } from "@/features/market/infrastructure/container";
+import { AreaMultiSelector } from "@/features/market/presentation/components/AreaMultiSelector";
 import { StatCard } from "@/features/market/presentation/components/StatCard";
 import { formatTrendText, formatTsuboPrice, formatYen, trendColorClass } from "@/features/market/presentation/lib/format";
+import { parseCodesParam, type SearchParams } from "@/features/market/presentation/lib/search-params";
 import { groupByArea } from "@/features/market/presentation/lib/trend-grouping";
-import { MIN_TREND_AREAS } from "@/features/market/presentation/lib/trend-selection";
+import { MAX_TREND_AREAS, MIN_TREND_AREAS } from "@/features/market/presentation/lib/trend-selection";
+import { toAreaSnapshotDto } from "@/features/market/presentation/mappers/area-snapshot.mapper";
 import { TrendComparisonChart } from "@/shared/ui/components/charts/TrendComparisonChart";
 import { HeatmapLegend } from "@/shared/ui/components/map/HeatmapLegend";
 import { MarketMap } from "@/shared/ui/components/map/MarketMap";
 
-// トレンドサマリーに表示する代表エリア数（坪単価が高い順）
+// エリア未選択時に自動表示する代表エリア数（坪単価が高い順）
 const TOP_AREA_COUNT = 3;
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const params = await searchParams;
+  const selectedCodes = parseCodesParam(params.codes);
+
   const [summaryResult, areasResult] = await Promise.all([
     marketContainer.getDashboardSummaryUseCase().execute(),
     marketContainer.getListAreasUseCase().execute(),
   ]);
 
-  const topCodes = areasResult
-    .match(
-      (snapshots) => [...snapshots],
-      () => [],
-    )
+  const areas = areasResult.match(
+    (snapshots) => snapshots.map(toAreaSnapshotDto),
+    () => [],
+  );
+
+  const autoTopCodes = [...areas]
     .sort((a, b) => b.avgUnitPriceYenPerSqm - a.avgUnitPriceYenPerSqm)
     .slice(0, TOP_AREA_COUNT)
-    .map((s) => s.area.code);
+    .map((a) => a.code);
+
+  const isCustomSelection = selectedCodes.length >= MIN_TREND_AREAS;
+  const topCodes = isCustomSelection ? selectedCodes.slice(0, MAX_TREND_AREAS) : autoTopCodes;
 
   const trendsResult =
     topCodes.length >= MIN_TREND_AREAS ? await marketContainer.getTrendsUseCase().execute({ codes: topCodes }) : null;
@@ -50,7 +60,16 @@ export default async function DashboardPage() {
       )}
 
       <section className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold">坪単価トップ{TOP_AREA_COUNT}エリアの価格推移</h2>
+        <h2 className="mb-4 text-lg font-semibold">
+          {isCustomSelection ? "選択エリアの価格推移" : `坪単価トップ${TOP_AREA_COUNT}エリアの価格推移`}
+        </h2>
+        <AreaMultiSelector
+          areas={areas}
+          selectedCodes={isCustomSelection ? selectedCodes : autoTopCodes}
+          min={MIN_TREND_AREAS}
+          max={MAX_TREND_AREAS}
+          href="/dashboard"
+        />
         {trendsResult ? (
           trendsResult.match(
             (history) => {
