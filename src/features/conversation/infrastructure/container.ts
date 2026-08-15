@@ -1,7 +1,7 @@
-import { GeminiLlmClient, type LlmClient } from "./llm-client";
+import { ClaudeLlmClient, GeminiLlmClient, OpenAiLlmClient, type LlmClient } from "./llm-client";
 
 // DIコンポジションルート。AI_PROVIDER環境変数で実装を切り替える（デフォルト: gemini）。
-// OpenAI/Claudeは恒久的な無料枠が無いため、現時点では未実装（Day34で拡張予定）。
+// OpenAI/Claudeは恒久的な無料枠が無いため、差し替え候補のスタブのみ用意している（ADR 0003）。
 function createLlmClient(): LlmClient {
   const provider = process.env.AI_PROVIDER ?? "gemini";
 
@@ -13,6 +13,10 @@ function createLlmClient(): LlmClient {
       }
       return new GeminiLlmClient(apiKey);
     }
+    case "openai":
+      return new OpenAiLlmClient();
+    case "claude":
+      return new ClaudeLlmClient();
     default:
       throw new Error(`未対応のAI_PROVIDERです: ${provider}`);
   }

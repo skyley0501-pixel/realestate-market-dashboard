@@ -66,3 +66,34 @@ export class GeminiLlmClient implements LlmClient {
     }
   }
 }
+
+// 将来コスト・レイテンシ比較のうえプロバイダを切り替える際の差し替え候補として、
+// LlmClientの実装だけを用意しておく（Day34）。OpenAI/Claude APIは恒久的な無料枠が
+// 無いため、実際のAPI呼び出しは未実装のまま明示的にエラーを投げる（詳細はADR 0003）。
+export class OpenAiLlmClient implements LlmClient {
+  completeStructured<T>(): Promise<T> {
+    throw new Error(
+      "OpenAiLlmClientは未実装です。OpenAI APIには恒久的な無料枠が無いため導入を見送っています（ADR 0003参照）。AI_PROVIDER=geminiを使用してください。",
+    );
+  }
+
+  streamChat(): AsyncIterable<string> {
+    throw new Error(
+      "OpenAiLlmClientは未実装です。OpenAI APIには恒久的な無料枠が無いため導入を見送っています（ADR 0003参照）。AI_PROVIDER=geminiを使用してください。",
+    );
+  }
+}
+
+export class ClaudeLlmClient implements LlmClient {
+  completeStructured<T>(): Promise<T> {
+    throw new Error(
+      "ClaudeLlmClientは未実装です。Claude APIには恒久的な無料枠が無いため導入を見送っています（ADR 0003参照）。AI_PROVIDER=geminiを使用してください。",
+    );
+  }
+
+  streamChat(): AsyncIterable<string> {
+    throw new Error(
+      "ClaudeLlmClientは未実装です。Claude APIには恒久的な無料枠が無いため導入を見送っています（ADR 0003参照）。AI_PROVIDER=geminiを使用してください。",
+    );
+  }
+}
