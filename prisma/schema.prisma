@@ -110,3 +110,26 @@ model AiAreaReport {
 
   @@map("ai_area_reports")
 }
+
+// AIチャットの1会話セッション。userIdはPhase5でSupabase Authを導入するまでは常にnull（匿名セッション）。
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String?       @map("user_id")
+  title     String?
+  createdAt DateTime      @default(now()) @map("created_at")
+  messages  ChatMessage[]
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String      @map("session_id")
+  session   ChatSession @relation(fields: [sessionId], references: [id])
+  role      String // "user" | "assistant"
+  content   String
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@map("chat_messages")
+}
