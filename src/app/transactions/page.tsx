@@ -4,6 +4,7 @@ import {
   findBuildingAgeRange,
 } from "@/features/transaction/domain/constants/transaction-search-filters";
 import { transactionContainer } from "@/features/transaction/infrastructure/container";
+import { NaturalLanguageSearchBox } from "@/features/transaction/presentation/components/NaturalLanguageSearchBox";
 import { TransactionFilterPanel } from "@/features/transaction/presentation/components/TransactionFilterPanel";
 import { TransactionTable } from "@/features/transaction/presentation/components/TransactionTable";
 import { toTransactionSummary } from "@/features/transaction/presentation/mappers/transaction-summary.mapper";
@@ -63,8 +64,12 @@ export default async function TransactionsPage({
   const buildingAgeRange = findBuildingAgeRange(parseOptionalString(params.buildingAgeRange) ?? "");
   // 築年数（経過年数）の範囲は、実行時点の年からbuildingYear（西暦）の範囲に変換して検索する
   const currentYear = new Date().getFullYear();
+  // 自然文検索（/api/search/nl）はレンジのkeyではなく築年（西暦）を直接クエリパラメータとして渡すため、
+  // 指定されていればそちらを優先する
+  const naturalMinBuildingYear = parseOptionalPositiveInt(params.minBuildingYear);
   const minBuildingYear =
-    buildingAgeRange?.maxBuildingAgeYears !== undefined ? currentYear - buildingAgeRange.maxBuildingAgeYears : undefined;
+    naturalMinBuildingYear ??
+    (buildingAgeRange?.maxBuildingAgeYears !== undefined ? currentYear - buildingAgeRange.maxBuildingAgeYears : undefined);
   const maxBuildingYear =
     buildingAgeRange?.minBuildingAgeYears !== undefined ? currentYear - buildingAgeRange.minBuildingAgeYears : undefined;
 
@@ -75,7 +80,8 @@ export default async function TransactionsPage({
       minPrice !== undefined ||
       maxPrice !== undefined ||
       areaSqmRange ||
-      buildingAgeRange,
+      buildingAgeRange ||
+      minBuildingYear !== undefined,
   );
 
   const result = hasAnyFilter
@@ -97,6 +103,7 @@ export default async function TransactionsPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">取引一覧</h1>
+      <NaturalLanguageSearchBox />
       <TransactionFilterPanel />
       {!result ? (
         <p className="py-8 text-center text-muted-foreground">

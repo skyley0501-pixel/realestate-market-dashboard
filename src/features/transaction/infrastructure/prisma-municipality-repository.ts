@@ -11,4 +11,12 @@ export class PrismaMunicipalityRepository implements MunicipalityRepository {
       select: { code: true, name: true },
     });
   }
+
+  async findByName(name: string): Promise<MunicipalityOption | null> {
+    return this.prisma.municipality.findFirst({
+      where: { name },
+      orderBy: { code: "asc" },
+      select: { code: true, name: true },
+    });
+  }
 }

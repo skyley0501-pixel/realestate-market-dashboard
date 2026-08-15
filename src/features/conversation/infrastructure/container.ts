@@ -1,4 +1,8 @@
+import { PrismaMunicipalityRepository } from "@/features/transaction/infrastructure/prisma-municipality-repository";
+import { prisma } from "@/shared/infrastructure/prisma/client";
+import { ParseNaturalLanguageSearchUseCase } from "../application/use-cases/parse-natural-language-search.usecase";
 import { ClaudeLlmClient, GeminiLlmClient, OpenAiLlmClient, type LlmClient } from "./llm-client";
+import { LlmNaturalLanguageQueryParser } from "./llm-natural-language-query-parser";
 
 // DIコンポジションルート。AI_PROVIDER環境変数で実装を切り替える（デフォルト: gemini）。
 // OpenAI/Claudeは恒久的な無料枠が無いため、差し替え候補のスタブのみ用意している（ADR 0003）。
@@ -22,6 +26,10 @@ function createLlmClient(): LlmClient {
   }
 }
 
+const municipalityRepository = new PrismaMunicipalityRepository(prisma);
+
 export const conversationContainer = {
   getLlmClient: (): LlmClient => createLlmClient(),
+  getParseNaturalLanguageSearchUseCase: () =>
+    new ParseNaturalLanguageSearchUseCase(new LlmNaturalLanguageQueryParser(createLlmClient()), municipalityRepository),
 };

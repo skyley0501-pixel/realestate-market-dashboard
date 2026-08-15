@@ -5,6 +5,7 @@ import { ListMunicipalitiesUseCase } from "./list-municipalities.usecase";
 function buildMockRepository(overrides: Partial<MunicipalityRepository> = {}): MunicipalityRepository {
   return {
     findByPrefectureCode: vi.fn(),
+    findByName: vi.fn(),
     ...overrides,
   };
 }
