@@ -407,7 +407,7 @@ export class ClaudeLlmClient implements LlmClient { /* ... */ }
 
 個人開発のため、意図せず課金が発生する事態は必ず避ける。以下を厳守する。
 
-- **使用モデルはFlash/Flash-Lite系に固定する**（`gemini-3.5-flash`等）。`GeminiLlmClient`はモデル名に`pro`を含む場合コンストラクタで例外を投げるガードを実装済み（[llm-client.ts](../src/features/conversation/infrastructure/llm-client.ts)）。ただしこれは命名規則ベースの簡易チェックであり、Googleが将来別命名の有料専用モデルを出す可能性はゼロではないため過信しない。
+- **使用モデルはFlash/Flash-Lite系に固定する**（デフォルト`gemini-3.6-flash`。`gemini-3.5-flash`は日本語固有名詞の文字化け不具合が確認されたため不採用。詳細はADR 0004）。`GeminiLlmClient`はモデル名に`pro`を含む場合コンストラクタで例外を投げるガードを実装済み（[llm-client.ts](../src/features/conversation/infrastructure/llm-client.ts)）。ただしこれは命名規則ベースの簡易チェックであり、Googleが将来別命名の有料専用モデルを出す可能性はゼロではないため過信しない。
 - **Google AI Studio / Google Cloud ConsoleでこのAPIキーのプロジェクトに請求先アカウント（Billing account）を絶対に紐付けない**。紐付けない限り、無料枠のFlash/Flash-Liteモデルはレート制限超過時に単に429エラーで拒否されるだけで、自動課金は発生しない。Billingを有効化すると無料枠を超えた分から即座に従量課金される点に注意。
 - レート制限の目安（2026年8月時点、変更されうる）: Flash 10RPM/250回/日、Flash-Lite 15RPM/1000回/日、全体で250,000TPM共有。Day41〜43のAIチャット機能実装時にレート制限（IPベース等）を必ず設け、無料枠の上限に達してサービスが止まらないようにする。
 - モデル名やSDKのバージョンアップ時は、[Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing)で対象モデルの「Free Tier」欄が「Free of charge」であることを都度確認してから使用する。

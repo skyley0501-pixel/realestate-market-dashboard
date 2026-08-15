@@ -14,7 +14,9 @@ export interface LlmClient {
 
 // 2026年8月時点でGemini APIの無料枠（Google AI Studio、カード登録不要）はFlash/Flash-Lite系モデルのみ。
 // Proモデル等は有料のため、意図せず切り替わって課金が発生しないようモデル名を検証する。
-const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
+// gemini-3.5-flashは複雑なプロンプトで日本語固有名詞が文字化けする不具合を確認したため、
+// gemini-3.6-flash（同条件で5/5回正常）を採用している（詳細はADR 0004）。
+const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
 const PAID_ONLY_MODEL_PATTERN = /\bpro\b/i;
 
 export class GeminiLlmClient implements LlmClient {
