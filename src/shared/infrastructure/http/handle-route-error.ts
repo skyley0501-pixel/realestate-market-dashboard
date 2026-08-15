@@ -10,6 +10,8 @@ const STATUS_MAP: Record<string, number> = {
   COMPARE_INVALID_CODES: 400,
   HEATMAP_INVALID_GRANULARITY: 400,
   MUNICIPALITY_INVALID_PREFECTURE_CODE: 400,
+  INVALID_PREDICTION_INPUT: 400,
+  AREA_NOT_FOUND_FOR_PREDICTION: 404,
 };
 
 export function handleRouteError(error: ApplicationError, requestId: string): NextResponse {

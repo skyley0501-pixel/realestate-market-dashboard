@@ -5,6 +5,7 @@ const NAV_LINKS = [
   { href: "/", label: "ホーム" },
   { href: "/dashboard", label: "ダッシュボード" },
   { href: "/transactions", label: "取引検索" },
+  { href: "/ai/predict", label: "価格予測" },
 ] as const;
 
 export function Header() {
