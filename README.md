@@ -4,19 +4,25 @@
 
 [デモを見る](https://realestate-market-dashboard.vercel.app/) · [設計書](./docs/design.md) · [ロードマップ](./docs/roadmap.md) · [ADR](./docs/adr/)
 
-## Phase 2で実装したこと
+## Phase 3で実装したこと
 
-- 取引検索: 市区町村・物件種別・間取り・価格帯による絞り込みと詳細表示
-- エリア分析: 中央値・坪単価・前期比・価格推移・間取り分布
+- 取引検索: 市区町村・物件種別・間取り・価格帯による絞り込みと詳細表示、自然文検索（AI）
+- エリア分析: 中央値・坪単価・前期比・価格推移・間取り分布、AIによる市況講評
 - 市場比較: 坪単価ランキング、複数エリアの時系列比較、レーダーチャート
 - マーケットマップ: MapLibre GLによる市区町村境界と坪単価ヒートマップ
 - 統合ダッシュボード: 主要指標、トレンド、ランキング、地図を1画面に集約
+- AI価格予測: エリア・面積・築年数から統計モデルで価格を推定し、寄与度を可視化
+- AIチャット相談: エリアの相場について、実際の統計データを踏まえてAIが回答（ストリーミング表示）
 
 ## スクリーンショット
 
 | 統合ダッシュボード | 坪単価ヒートマップ | エリア比較（レーダーチャート） |
 |---|---|---|
 | ![統合ダッシュボード](./docs/images/dashboard.jpg) | ![坪単価ヒートマップ](./docs/images/heatmap.jpg) | ![エリア比較](./docs/images/area-comparison.jpg) |
+
+| AIによる市況講評 | 自然文検索 | AI価格予測 | AIチャット相談 |
+|---|---|---|---|
+| ![AIによる市況講評](./docs/images/ai-area-report.png) | ![自然文検索](./docs/images/natural-language-search.png) | ![AI価格予測](./docs/images/price-prediction.png) | ![AIチャット相談](./docs/images/ai-chat.png) |
 
 ## 技術的な特徴
 
@@ -33,6 +39,7 @@
 | フロントエンド | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, shadcn/ui |
 | 可視化 | MapLibre GL, Chart.js, GeoJSON |
 | バックエンド | Next.js Route Handlers, Supabase (PostgreSQL), Prisma 7, Zod |
+| AI | Gemini API（構造化出力・ストリーミング）、Upstash Redis（レート制限） |
 | テスト・運用 | Vitest, ESLint, GitHub Actions, Vercel |
 
 ## アーキテクチャ
