@@ -68,8 +68,8 @@
 
 | Day | タスク | 実装内容 | 完了条件 | コミット例 |
 |---|---|---|---|---|
-| 33 | LlmClient抽象化 | `LlmClient` interface定義、`OpenAiLlmClient`実装、環境変数`AI_PROVIDER`によるcontainer切替 | OpenAI経由で単純なプロンプト応答がテストで確認できる | `feat(conversation): add LlmClient abstraction with OpenAI adapter` |
-| 34 | Claude実装追加 | `ClaudeLlmClient`実装、同一interfaceでの動作確認 | `AI_PROVIDER=claude`でも同じUseCaseが動作する | `feat(conversation): add Claude adapter for LlmClient` |
+| 33 | LlmClient抽象化 | `LlmClient` interface定義、`GeminiLlmClient`実装（無料枠のFlashモデルを使用）、環境変数`AI_PROVIDER`によるcontainer切替（デフォルト`gemini`） | Gemini経由で単純なプロンプト応答がテストで確認できる | `feat(conversation): add LlmClient abstraction with Gemini adapter` |
+| 34 | 将来プロバイダ差し替え用アダプタ整備 | `OpenAiLlmClient`/`ClaudeLlmClient`のスタブ実装（`AI_PROVIDER`切替の型のみ用意、実呼び出しは未実装として明示的にエラー）、README/ADRに切り替え方針を記録 | `AI_PROVIDER`に`openai`/`claude`を指定した際、意図が伝わるエラーメッセージで失敗する | `feat(conversation): add provider-switch stubs for OpenAI/Claude` |
 | 35 | AIエリア講評: ドメイン・UseCase | `AiAreaReportRepository` interface、`GetAreaReportUseCase`実装（キャッシュ確認→なければ生成） | モックLlmClientでUseCaseの単体テストが通る | `feat(market): add area report generation use case` |
 | 36 | AIエリア講評: DB・API・UI統合 | `ai_area_reports`テーブル追加、`/api/areas/[code]/report`実装、`AreaReportPanel`をエリア詳細に統合 | エリア詳細ページでAI生成レポートが表示され、再訪時はキャッシュから即座に表示される | `feat(market): integrate AI area report into area detail page` |
 | 37 | 自然言語検索: パーサー実装 | `NaturalLanguageQueryParser` interface・実装（function callingで検索条件JSON化）、Zodスキーマで出力検証 | 「渋谷区で築10年以内5000万円台」→正しい検索条件JSONに変換されるテストが通る | `feat(conversation): add natural language query parser` |

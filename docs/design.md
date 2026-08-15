@@ -19,7 +19,7 @@
 | サーバー状態管理 | React Query（TanStack Query） |
 | バリデーション | Zod |
 | フォーム | React Hook Form |
-| AI | OpenAI API または Claude API（切り替え可能なAdapter構成） |
+| AI | Gemini API（無料枠で利用可能。OpenAI/Claude APIへの切り替えも可能なAdapter構成） |
 | ホスティング | Vercel |
 | CI/CD | GitHub Actions |
 | 設計思想 | Clean Architecture ／ Feature First ／ DDD（軽量適用） |
@@ -57,7 +57,7 @@ flowchart TB
     subgraph Infrastructure["Infrastructure層（features/*/infrastructure, shared/infrastructure）"]
         I1[Prisma Repository実装]
         I2[Supabase Authアダプタ]
-        I3[OpenAI/Claude Client]
+        I3[Gemini Client]
     end
 
     Presentation --> Application
@@ -141,7 +141,7 @@ realestate-market-dashboard/
 │   │   │   │   └── dto/area-dto.ts
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── prisma-area-repository.ts
-│   │   │   │   ├── ai-report-generator.ts                  # OpenAI/Claude呼び出し
+│   │   │   │   ├── ai-report-generator.ts                  # Gemini呼び出し
 │   │   │   │   └── container.ts                            # DIコンポジションルート
 │   │   │   └── presentation/
 │   │   │       ├── components/AreaRankingTable.tsx
@@ -165,7 +165,7 @@ realestate-market-dashboard/
 │   │   ├── conversation/
 │   │   │   ├── domain/{entities/{chat-session,chat-message}.ts, services/natural-language-query-parser.ts, repositories/chat-repository.ts}
 │   │   │   ├── application/use-cases/{send-chat-message,parse-natural-language-search}.usecase.ts
-│   │   │   ├── infrastructure/{prisma-chat-repository.ts, llm-client.ts, container.ts}   # llm-client.tsがOpenAI/Claude切り替えAdapter
+│   │   │   ├── infrastructure/{prisma-chat-repository.ts, llm-client.ts, container.ts}   # llm-client.tsがGemini/OpenAI/Claude切り替えAdapter
 │   │   │   └── presentation/{components/{ChatWindow,ChatMessageBubble,ChatSuggestionChips}.tsx, hooks/useChat.ts}
 │   │   │
 │   │   └── identity/
@@ -392,13 +392,25 @@ export async function GET(req: NextRequest, { params }: { params: { code: string
 // features/conversation/infrastructure/llm-client.ts
 export interface LlmClient {
   completeStructured<T>(prompt: string, schema: z.ZodSchema<T>): Promise<T>;
-  streamChat(messages: ChatMessage[]): AsyncIterable<string>;
+  streamChat(messages: LlmChatMessage[]): AsyncIterable<string>;
 }
+export class GeminiLlmClient implements LlmClient { /* ... */ }
 export class OpenAiLlmClient implements LlmClient { /* ... */ }
 export class ClaudeLlmClient implements LlmClient { /* ... */ }
 ```
 
-環境変数 `AI_PROVIDER=openai|claude` によって `container.ts` が実装を選択する。UseCase・Presentation層はどちらのプロバイダかを一切知らない。
+環境変数 `AI_PROVIDER=gemini|openai|claude`（デフォルト: `gemini`）によって `container.ts` が実装を選択する。UseCase・Presentation層はどのプロバイダかを一切知らない。
+
+デフォルトプロバイダとして**Gemini API**を採用する。OpenAI/Claude APIには恒久的な無料枠が無く（新規登録時の少額トライアルクレジットのみ）、Gemini APIはGoogle AI Studio経由でFlash/Flash-Liteモデルがクレジットカード登録不要の無料枠として利用できるため（2026年8月時点）。`LlmClient`によるプロバイダ非依存の抽象化は維持し、`OpenAiLlmClient`/`ClaudeLlmClient`は将来コスト面で切り替える際に差し替えられる設計上の枠として用意する。
+
+#### 無料枠を維持するための注意点（有料化防止）
+
+個人開発のため、意図せず課金が発生する事態は必ず避ける。以下を厳守する。
+
+- **使用モデルはFlash/Flash-Lite系に固定する**（`gemini-3.5-flash`等）。`GeminiLlmClient`はモデル名に`pro`を含む場合コンストラクタで例外を投げるガードを実装済み（[llm-client.ts](../src/features/conversation/infrastructure/llm-client.ts)）。ただしこれは命名規則ベースの簡易チェックであり、Googleが将来別命名の有料専用モデルを出す可能性はゼロではないため過信しない。
+- **Google AI Studio / Google Cloud ConsoleでこのAPIキーのプロジェクトに請求先アカウント（Billing account）を絶対に紐付けない**。紐付けない限り、無料枠のFlash/Flash-Liteモデルはレート制限超過時に単に429エラーで拒否されるだけで、自動課金は発生しない。Billingを有効化すると無料枠を超えた分から即座に従量課金される点に注意。
+- レート制限の目安（2026年8月時点、変更されうる）: Flash 10RPM/250回/日、Flash-Lite 15RPM/1000回/日、全体で250,000TPM共有。Day41〜43のAIチャット機能実装時にレート制限（IPベース等）を必ず設け、無料枠の上限に達してサービスが止まらないようにする。
+- モデル名やSDKのバージョンアップ時は、[Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing)で対象モデルの「Free Tier」欄が「Free of charge」であることを都度確認してから使用する。
 
 ---
 
@@ -561,7 +573,7 @@ sequenceDiagram
     participant API as /api/ai/chat (Route Handler)
     participant UC as SendChatMessageUseCase
     participant Parser as NaturalLanguageQueryParser
-    participant Llm as LlmClient(OpenAI/Claude)
+    participant Llm as LlmClient(Gemini)
     participant TxUC as SearchTransactionsUseCase
 
     U->>Chat: 「渋谷区で築10年以内5000万円台」と入力
@@ -582,7 +594,7 @@ sequenceDiagram
 
 ## 13. 未確定事項・今後の検討課題
 
-- OpenAI / Claude のどちらをデフォルトプロバイダとするか（コスト・レイテンシ比較のうえ決定）
+- ~~OpenAI / Claude のどちらをデフォルトプロバイダとするか~~ → 2026-08-15確定: Gemini API（無料枠あり）をデフォルトに採用。OpenAI/Claudeは恒久的な無料枠が無いため見送り、`LlmClient`抽象化により将来切り替え可能な設計のみ維持
 - 価格予測モデルの精度評価方法（バックテスト用の検証データ分割方針）
 - レート制限の具体的な閾値（Upstash Redis等の導入要否）
 - Supabase Storageを画像・エクスポートPDF等で使うか（現状は未使用）
