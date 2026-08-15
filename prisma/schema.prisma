@@ -30,6 +30,7 @@ model Municipality {
   stations       Station[]
   transactions   Transaction[]
   areaStatistics AreaStatistics[]
+  aiAreaReport   AiAreaReport?
 
   @@map("municipalities")
 }
@@ -96,4 +97,16 @@ model AreaStatistics {
   @@unique([municipalityCode, period])
   @@index([period])
   @@map("area_statistics")
+}
+
+// AIが生成したエリア講評のキャッシュ。GetAreaReportUseCaseが未生成時にLlmClient（Gemini）で
+// 生成し保存する。エリアごとに最新1件のみ保持するシンプルなキャッシュモデル。
+model AiAreaReport {
+  id               String       @id @default(cuid())
+  municipalityCode String       @unique @map("municipality_code")
+  municipality     Municipality @relation(fields: [municipalityCode], references: [code])
+  content          String
+  generatedAt      DateTime     @default(now()) @map("generated_at")
+
+  @@map("ai_area_reports")
 }

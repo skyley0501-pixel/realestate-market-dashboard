@@ -1,5 +1,6 @@
 import { marketContainer } from "@/features/market/infrastructure/container";
 import { AreaDetailHeader } from "@/features/market/presentation/components/AreaDetailHeader";
+import { AreaReportPanel } from "@/features/market/presentation/components/AreaReportPanel";
 import { FloorPlanDistributionChart } from "@/features/market/presentation/components/FloorPlanDistributionChart";
 import { toAreaSnapshotDto } from "@/features/market/presentation/mappers/area-snapshot.mapper";
 import { transactionContainer } from "@/features/transaction/infrastructure/container";
@@ -48,6 +49,11 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ cod
       return (
         <div className="mx-auto max-w-5xl px-4 py-8">
           <AreaDetailHeader area={area} />
+
+          <section className="mb-8">
+            <h2 className="mb-4 text-lg font-semibold">AIによる市況講評</h2>
+            <AreaReportPanel key={area.code} code={area.code} />
+          </section>
 
           <section className="mb-8">
             <h2 className="mb-4 text-lg font-semibold">価格推移（中央値）</h2>
