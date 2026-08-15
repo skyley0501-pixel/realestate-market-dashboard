@@ -1,6 +1,7 @@
 import { conversationContainer } from "@/features/conversation/infrastructure/container";
-import { badRequest, handleRouteError } from "@/shared/infrastructure/http/handle-route-error";
+import { badRequest, handleRouteError, rateLimitExceeded } from "@/shared/infrastructure/http/handle-route-error";
 import { createRequestId } from "@/shared/infrastructure/http/request-id";
+import { checkAiRateLimit, getClientIp } from "@/shared/infrastructure/rate-limit/ai-rate-limiter";
 import { type NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -15,6 +16,11 @@ function sseEvent(event: string, data: unknown): string {
 
 export async function POST(req: NextRequest) {
   const requestId = createRequestId();
+
+  const rateLimit = await checkAiRateLimit(getClientIp(req));
+  if (!rateLimit.success) {
+    return rateLimitExceeded(requestId);
+  }
 
   const parsed = SendChatMessageRequestSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

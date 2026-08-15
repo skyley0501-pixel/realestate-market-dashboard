@@ -35,3 +35,16 @@ export function badRequest(zodError: ZodError, requestId: string): NextResponse 
     { status: 400 },
   );
 }
+
+export function rateLimitExceeded(requestId: string): NextResponse {
+  return NextResponse.json(
+    {
+      error: {
+        code: "RATE_LIMIT_EXCEEDED",
+        message: "リクエストが多すぎます。しばらくしてから再度お試しください。",
+        requestId,
+      },
+    },
+    { status: 429 },
+  );
+}
