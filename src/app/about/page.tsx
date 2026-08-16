@@ -79,17 +79,22 @@ function ArchitectureDiagram() {
       <path d="M444 68 H460" stroke="currentColor" strokeWidth={2} markerEnd="url(#arrow)" />
 
       {/* Infrastructure（下段） */}
-      <rect x={244} y={172} width={196} height={64} rx={14} className="fill-chart-3/15 stroke-chart-3" strokeWidth={1.5} />
-      <text x={264} y={202} className="fill-chart-3 text-base font-semibold">
+      <rect x={244} y={172} width={216} height={76} rx={14} className="fill-chart-3/15 stroke-chart-3" strokeWidth={1.5} />
+      <text x={260} y={202} className="fill-chart-3 text-base font-semibold">
         Infrastructure
       </text>
-      <text x={264} y={222} className="fill-current text-xs">
-        Repository実装 / Prisma / 外部API
+      <text x={260} y={222} className="fill-current text-xs">
+        <tspan x={260} dy={0}>
+          Repository実装 / Prisma
+        </tspan>
+        <tspan x={260} dy={16}>
+          外部API
+        </tspan>
       </text>
 
       {/* Infrastructure → Domain（破線・Repository interfaceの実装で依存性逆転） */}
       <path
-        d="M420 172 C 460 140, 520 100, 562 112"
+        d="M440 172 C 470 140, 520 100, 562 112"
         fill="none"
         stroke="currentColor"
         strokeWidth={1.5}

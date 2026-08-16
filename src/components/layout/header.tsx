@@ -8,7 +8,7 @@ export function Header() {
   return (
     <header className="border-b">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 md:h-14 md:py-0">
-        <Link href="/" className="whitespace-nowrap font-semibold">
+        <Link href="/" className="whitespace-nowrap text-2xl font-bold tracking-tight">
           REMDA
         </Link>
         <nav aria-label="メインナビゲーション" className="hidden md:block">

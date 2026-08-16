@@ -17,7 +17,7 @@ export function AnalysisNavDropdown() {
         エリア分析
         <ChevronDown className="size-3.5" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="w-max min-w-40">
         {ANALYSIS_LINKS.map((link) => (
           <DropdownMenuLinkItem key={link.href} closeOnClick render={<Link href={link.href} />}>
             {link.label}
