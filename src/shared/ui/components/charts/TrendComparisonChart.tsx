@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { chartTooltipStyle, useChartTheme } from "../../lib/chart-theme";
 import { seriesColor } from "../../lib/chart-colors";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
@@ -25,11 +26,12 @@ export interface TrendComparisonChartProps {
 }
 
 export function TrendComparisonChart({ series }: TrendComparisonChartProps) {
+  const theme = useChartTheme();
   // 各エリアのデータ収集期間が揃っていない場合に備え、全期間の和集合を昇順で共通X軸にする
   const labels = [...new Set(series.flatMap((s) => s.points.map((p) => p.period)))].sort();
 
   const datasets = series.map((s, index) => {
-    const color = seriesColor(index);
+    const color = seriesColor(index, theme.mode);
     const valueByPeriod = new Map(s.points.map((p) => [p.period, p.medianPriceYen]));
     return {
       label: s.label,
@@ -48,8 +50,9 @@ export function TrendComparisonChart({ series }: TrendComparisonChartProps) {
       options={{
         responsive: true,
         plugins: {
-          legend: { position: "bottom" },
+          legend: { position: "bottom", labels: { color: theme.text } },
           tooltip: {
+            ...chartTooltipStyle(theme),
             callbacks: {
               label: (context) =>
                 `${context.dataset.label}: ${Number(context.parsed.y).toLocaleString("ja-JP")}円`,
@@ -57,9 +60,11 @@ export function TrendComparisonChart({ series }: TrendComparisonChartProps) {
           },
         },
         scales: {
+          x: { ticks: { color: theme.text }, grid: { color: theme.grid } },
           y: {
             beginAtZero: false,
-            ticks: { callback: (value) => Number(value).toLocaleString("ja-JP") },
+            ticks: { color: theme.text, callback: (value) => Number(value).toLocaleString("ja-JP") },
+            grid: { color: theme.grid },
           },
         },
       }}

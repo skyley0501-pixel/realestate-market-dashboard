@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { Radar } from "react-chartjs-2";
+import { chartTooltipStyle, useChartTheme } from "../../lib/chart-theme";
 import { seriesColor } from "../../lib/chart-colors";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
@@ -51,11 +52,12 @@ function rawValue(area: AreaComparisonMetrics, key: AxisKey): number {
 }
 
 export function AreaComparisonView({ areas }: AreaComparisonViewProps) {
+  const theme = useChartTheme();
   // 軸ごとに選択エリア内の最大値を100%とした相対値に正規化する（指標間の単位・スケールが大きく異なるため）
   const axisMax = AXES.map((axis) => Math.max(...areas.map((area) => rawValue(area, axis.key)), 1));
 
   const datasets = areas.map((area, index) => {
-    const color = seriesColor(index);
+    const color = seriesColor(index, theme.mode);
     return {
       label: area.label,
       data: AXES.map((axis, i) => (rawValue(area, axis.key) / axisMax[i]) * 100),
@@ -72,8 +74,9 @@ export function AreaComparisonView({ areas }: AreaComparisonViewProps) {
       options={{
         responsive: true,
         plugins: {
-          legend: { position: "bottom" },
+          legend: { position: "bottom", labels: { color: theme.text } },
           tooltip: {
+            ...chartTooltipStyle(theme),
             callbacks: {
               label: (context) => {
                 const axis = AXES[context.dataIndex];
@@ -85,7 +88,14 @@ export function AreaComparisonView({ areas }: AreaComparisonViewProps) {
           },
         },
         scales: {
-          r: { min: 0, max: 100, ticks: { display: false } },
+          r: {
+            min: 0,
+            max: 100,
+            ticks: { display: false },
+            grid: { color: theme.grid },
+            angleLines: { color: theme.grid },
+            pointLabels: { color: theme.text },
+          },
         },
       }}
     />

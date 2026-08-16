@@ -2,11 +2,9 @@
 
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { chartTooltipStyle, useChartTheme } from "@/shared/ui/lib/chart-theme";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
-
-// neutral-900相当。既存のshadcn/ui neutralテーマ（--primary）に合わせた単色（単一系列のため凡例は表示しない）
-const BAR_COLOR = "#171717";
 
 export interface FloorPlanDistributionChartProps {
   labels: string[]; // 間取り（例: "2LDK"）。件数の多い順
@@ -14,6 +12,8 @@ export interface FloorPlanDistributionChartProps {
 }
 
 export function FloorPlanDistributionChart({ labels, counts }: FloorPlanDistributionChartProps) {
+  const theme = useChartTheme();
+
   return (
     <Bar
       data={{
@@ -22,7 +22,7 @@ export function FloorPlanDistributionChart({ labels, counts }: FloorPlanDistribu
           {
             label: "件数",
             data: counts,
-            backgroundColor: BAR_COLOR,
+            backgroundColor: theme.line,
             borderRadius: 4,
           },
         ],
@@ -32,13 +32,15 @@ export function FloorPlanDistributionChart({ labels, counts }: FloorPlanDistribu
         plugins: {
           legend: { display: false },
           tooltip: {
+            ...chartTooltipStyle(theme),
             callbacks: {
               label: (context) => `${context.parsed.y}件`,
             },
           },
         },
         scales: {
-          y: { beginAtZero: true, ticks: { precision: 0 } },
+          x: { ticks: { color: theme.text }, grid: { color: theme.grid } },
+          y: { beginAtZero: true, ticks: { color: theme.text, precision: 0 }, grid: { color: theme.grid } },
         },
       }}
     />

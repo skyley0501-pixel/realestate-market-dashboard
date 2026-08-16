@@ -10,11 +10,9 @@ import {
   Tooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { chartTooltipStyle, useChartTheme } from "../../lib/chart-theme";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
-
-// neutral-900相当。既存のshadcn/ui neutralテーマ（--primary）に合わせた単色（単一系列のため凡例は表示しない）
-const LINE_COLOR = "#171717";
 
 export interface PriceTrendChartProps {
   labels: string[]; // 例: ["2025Q1", "2025Q2", "2025Q3", "2025Q4"]
@@ -23,6 +21,8 @@ export interface PriceTrendChartProps {
 }
 
 export function PriceTrendChart({ labels, values, valueLabel = "中央値（円）" }: PriceTrendChartProps) {
+  const theme = useChartTheme();
+
   return (
     <Line
       data={{
@@ -31,8 +31,8 @@ export function PriceTrendChart({ labels, values, valueLabel = "中央値（円�
           {
             label: valueLabel,
             data: values,
-            borderColor: LINE_COLOR,
-            backgroundColor: LINE_COLOR,
+            borderColor: theme.line,
+            backgroundColor: theme.line,
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.15,
@@ -44,15 +44,18 @@ export function PriceTrendChart({ labels, values, valueLabel = "中央値（円�
         plugins: {
           legend: { display: false },
           tooltip: {
+            ...chartTooltipStyle(theme),
             callbacks: {
               label: (context) => `${valueLabel}: ${Number(context.parsed.y).toLocaleString("ja-JP")}円`,
             },
           },
         },
         scales: {
+          x: { ticks: { color: theme.text }, grid: { color: theme.grid } },
           y: {
             beginAtZero: false,
-            ticks: { callback: (value) => Number(value).toLocaleString("ja-JP") },
+            ticks: { color: theme.text, callback: (value) => Number(value).toLocaleString("ja-JP") },
+            grid: { color: theme.grid },
           },
         },
       }}
