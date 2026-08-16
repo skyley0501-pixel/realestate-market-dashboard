@@ -26,37 +26,68 @@ describe("PrismaAiAreaReportRepository (integration)", () => {
     await prisma.municipality.deleteMany({ where: { code: testMunicipalityCode } });
   });
 
-  it("saveで保存した内容をfindByAreaCodeで取得できる", async () => {
+  it("saveで保存した内容をfindByAreaCodeAndPeriodで取得できる", async () => {
     const report = AiAreaReport.create({
       areaCode: testMunicipalityCode,
+      period: "2026Q1",
       content: "テスト用の講評文です。",
       generatedAt: new Date("2026-08-15T00:00:00.000Z"),
     });
 
     await repository.save(report);
-    const found = await repository.findByAreaCode(testMunicipalityCode);
+    const found = await repository.findByAreaCodeAndPeriod(testMunicipalityCode, "2026Q1");
 
     expect(found).not.toBeNull();
     expect(found?.content).toBe("テスト用の講評文です。");
+    expect(found?.period).toBe("2026Q1");
   });
 
-  it("saveを2回呼ぶと洗い替えされる（エリアごとに最新1件のみ保持）", async () => {
+  it("同一期間へのsaveを2回呼ぶと洗い替えされる（エリア×期間ごとに最新1件のみ保持）", async () => {
     await repository.save(
-      AiAreaReport.create({ areaCode: testMunicipalityCode, content: "1回目", generatedAt: new Date() }),
+      AiAreaReport.create({
+        areaCode: testMunicipalityCode,
+        period: "2026Q1",
+        content: "1回目",
+        generatedAt: new Date(),
+      }),
     );
     await repository.save(
-      AiAreaReport.create({ areaCode: testMunicipalityCode, content: "2回目", generatedAt: new Date() }),
+      AiAreaReport.create({
+        areaCode: testMunicipalityCode,
+        period: "2026Q1",
+        content: "2回目",
+        generatedAt: new Date(),
+      }),
     );
 
-    const found = await repository.findByAreaCode(testMunicipalityCode);
-    const count = await prisma.aiAreaReport.count({ where: { municipalityCode: testMunicipalityCode } });
+    const found = await repository.findByAreaCodeAndPeriod(testMunicipalityCode, "2026Q1");
+    const count = await prisma.aiAreaReport.count({
+      where: { municipalityCode: testMunicipalityCode, period: "2026Q1" },
+    });
 
     expect(found?.content).toBe("2回目");
     expect(count).toBe(1);
   });
 
-  it("未生成のエリアコードにはnullを返す", async () => {
-    const found = await repository.findByAreaCode("not-exist-code");
+  it("異なる期間は別レコードとして保持され、古い期間のキャッシュは新しい期間の問い合わせに影響しない", async () => {
+    await repository.save(
+      AiAreaReport.create({
+        areaCode: testMunicipalityCode,
+        period: "2025Q4",
+        content: "2025Q4向けの講評",
+        generatedAt: new Date(),
+      }),
+    );
+
+    const oldPeriodResult = await repository.findByAreaCodeAndPeriod(testMunicipalityCode, "2025Q4");
+    const newPeriodResult = await repository.findByAreaCodeAndPeriod(testMunicipalityCode, "2026Q2");
+
+    expect(oldPeriodResult?.content).toBe("2025Q4向けの講評");
+    expect(newPeriodResult).toBeNull();
+  });
+
+  it("未生成のエリアコード・期間にはnullを返す", async () => {
+    const found = await repository.findByAreaCodeAndPeriod("not-exist-code", "2026Q1");
     expect(found).toBeNull();
   });
 });

@@ -34,11 +34,6 @@ export class GetAreaReportUseCase {
 
   async execute(input: GetAreaReportInput): Promise<Result<AiAreaReport, ApplicationError>> {
     try {
-      const cached = await this.aiAreaReportRepository.findByAreaCode(input.code);
-      if (cached) {
-        return Result.ok(cached);
-      }
-
       const snapshot = await this.areaRepository.findLatestSnapshotByCode(input.code);
       if (!snapshot) {
         return Result.err(
@@ -50,9 +45,17 @@ export class GetAreaReportUseCase {
         );
       }
 
+      // キャッシュ判定には最新の対象期間が必要なため、statistics取得後にキャッシュを確認する
+      // （期間が進んでも古い期間の講評を返し続けないようにするため）
+      const cached = await this.aiAreaReportRepository.findByAreaCodeAndPeriod(input.code, snapshot.period);
+      if (cached) {
+        return Result.ok(cached);
+      }
+
       const generated = await this.llmClient.completeStructured(buildPrompt(snapshot), reportSchema);
       const report = AiAreaReport.create({
         areaCode: input.code,
+        period: snapshot.period,
         content: generated.content,
         generatedAt: new Date(),
       });

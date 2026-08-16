@@ -10,10 +10,10 @@ import { PriceStatistics } from "../../domain/value-objects/price-statistics";
 import { TrendRate } from "../../domain/value-objects/trend-rate";
 import { GetAreaReportUseCase } from "./get-area-report.usecase";
 
-function buildSnapshot(code: string): AreaMarketSnapshot {
+function buildSnapshot(code: string, period = "2025Q4"): AreaMarketSnapshot {
   return AreaMarketSnapshot.create({
     area: Area.create({ code, name: "千代田区", prefectureCode: "13", prefectureName: "東京都" }),
-    period: "2025Q4",
+    period,
     statistics: PriceStatistics.reconstruct(
       Money.fromYen(50_000_000),
       Money.fromYen(52_000_000),
@@ -42,7 +42,7 @@ function buildMockAiAreaReportRepository(
   overrides: Partial<AiAreaReportRepository> = {},
 ): AiAreaReportRepository {
   return {
-    findByAreaCode: vi.fn(),
+    findByAreaCodeAndPeriod: vi.fn(),
     save: vi.fn(),
     ...overrides,
   };
@@ -57,11 +57,19 @@ function buildMockLlmClient(overrides: Partial<LlmClient> = {}): LlmClient {
 }
 
 describe("GetAreaReportUseCase", () => {
-  it("キャッシュ済みレポートがあればLLMを呼ばずにそれを返す", async () => {
-    const cached = AiAreaReport.create({ areaCode: "13101", content: "既存の講評", generatedAt: new Date() });
-    const areaRepository = buildMockAreaRepository();
+  it("最新期間と一致するキャッシュ済みレポートがあればLLMを呼ばずにそれを返す", async () => {
+    const snapshot = buildSnapshot("13101", "2025Q4");
+    const cached = AiAreaReport.create({
+      areaCode: "13101",
+      period: "2025Q4",
+      content: "既存の講評",
+      generatedAt: new Date(),
+    });
+    const areaRepository = buildMockAreaRepository({
+      findLatestSnapshotByCode: vi.fn().mockResolvedValue(snapshot),
+    });
     const aiAreaReportRepository = buildMockAiAreaReportRepository({
-      findByAreaCode: vi.fn().mockResolvedValue(cached),
+      findByAreaCodeAndPeriod: vi.fn().mockResolvedValue(cached),
     });
     const llmClient = buildMockLlmClient();
     const useCase = new GetAreaReportUseCase(areaRepository, aiAreaReportRepository, llmClient);
@@ -75,7 +83,39 @@ describe("GetAreaReportUseCase", () => {
       },
     );
     expect(llmClient.completeStructured).not.toHaveBeenCalled();
-    expect(areaRepository.findLatestSnapshotByCode).not.toHaveBeenCalled();
+    expect(aiAreaReportRepository.findByAreaCodeAndPeriod).toHaveBeenCalledWith("13101", "2025Q4");
+  });
+
+  it("統計の対象期間が進んでいる場合はキャッシュを無視して再生成する（古い期間のキャッシュを返さない）", async () => {
+    const latestSnapshot = buildSnapshot("13101", "2026Q1");
+    const areaRepository = buildMockAreaRepository({
+      findLatestSnapshotByCode: vi.fn().mockResolvedValue(latestSnapshot),
+    });
+    // findByAreaCodeAndPeriodには最新期間("2026Q1")で問い合わせるため、古い期間のキャッシュしか
+    // 無いケースをシミュレートするとnullが返る想定
+    const aiAreaReportRepository = buildMockAiAreaReportRepository({
+      findByAreaCodeAndPeriod: vi.fn().mockResolvedValue(null),
+    });
+    const llmClient = buildMockLlmClient({
+      completeStructured: vi.fn().mockResolvedValue({ content: "2026Q1向けの新しい講評" }),
+    });
+    const useCase = new GetAreaReportUseCase(areaRepository, aiAreaReportRepository, llmClient);
+
+    const result = await useCase.execute({ code: "13101" });
+
+    result.match(
+      (value) => {
+        expect(value.content).toBe("2026Q1向けの新しい講評");
+        expect(value.period).toBe("2026Q1");
+      },
+      () => {
+        throw new Error("unreachable");
+      },
+    );
+    expect(aiAreaReportRepository.findByAreaCodeAndPeriod).toHaveBeenCalledWith("13101", "2026Q1");
+    expect(aiAreaReportRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ period: "2026Q1" }),
+    );
   });
 
   it("キャッシュが無ければ統計データからLLMで生成し、保存してから返す", async () => {
@@ -84,7 +124,7 @@ describe("GetAreaReportUseCase", () => {
       findLatestSnapshotByCode: vi.fn().mockResolvedValue(snapshot),
     });
     const aiAreaReportRepository = buildMockAiAreaReportRepository({
-      findByAreaCode: vi.fn().mockResolvedValue(null),
+      findByAreaCodeAndPeriod: vi.fn().mockResolvedValue(null),
     });
     const llmClient = buildMockLlmClient({
       completeStructured: vi.fn().mockResolvedValue({ content: "生成された講評" }),
@@ -107,9 +147,7 @@ describe("GetAreaReportUseCase", () => {
     const areaRepository = buildMockAreaRepository({
       findLatestSnapshotByCode: vi.fn().mockResolvedValue(null),
     });
-    const aiAreaReportRepository = buildMockAiAreaReportRepository({
-      findByAreaCode: vi.fn().mockResolvedValue(null),
-    });
+    const aiAreaReportRepository = buildMockAiAreaReportRepository();
     const llmClient = buildMockLlmClient();
     const useCase = new GetAreaReportUseCase(areaRepository, aiAreaReportRepository, llmClient);
 
@@ -122,6 +160,7 @@ describe("GetAreaReportUseCase", () => {
       (error) => expect(error.code).toBe("AREA_NOT_FOUND"),
     );
     expect(llmClient.completeStructured).not.toHaveBeenCalled();
+    expect(aiAreaReportRepository.findByAreaCodeAndPeriod).not.toHaveBeenCalled();
   });
 
   it("LLM呼び出しが失敗した場合はAREA_REPORT_FAILEDのResult.errを返す", async () => {
@@ -130,7 +169,7 @@ describe("GetAreaReportUseCase", () => {
       findLatestSnapshotByCode: vi.fn().mockResolvedValue(snapshot),
     });
     const aiAreaReportRepository = buildMockAiAreaReportRepository({
-      findByAreaCode: vi.fn().mockResolvedValue(null),
+      findByAreaCodeAndPeriod: vi.fn().mockResolvedValue(null),
     });
     const llmClient = buildMockLlmClient({
       completeStructured: vi.fn().mockRejectedValue(new Error("Gemini APIエラー")),

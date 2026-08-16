@@ -45,7 +45,16 @@ export async function POST(req: NextRequest) {
             }
             controller.enqueue(encoder.encode(sseEvent("done", {})));
           } catch (error) {
-            controller.enqueue(encoder.encode(sseEvent("error", { message: String(error) })));
+            // SDK・内部構成の情報が利用者へ漏れないよう、詳細はrequestId付きでサーバーログにのみ残す
+            console.error(JSON.stringify({ requestId, code: "CHAT_STREAM_FAILED", message: String(error) }));
+            controller.enqueue(
+              encoder.encode(
+                sseEvent("error", {
+                  message: "回答の生成に失敗しました。しばらくしてから再度お試しください。",
+                  requestId,
+                }),
+              ),
+            );
           } finally {
             controller.close();
           }
