@@ -10,6 +10,108 @@ const TECH_STACK_GROUPS = [
   { category: "品質・運用", items: ["Vitest", "ESLint", "GitHub Actions", "Vercel"] },
 ] as const;
 
+const ARCHITECTURE_LAYERS = [
+  {
+    id: "presentation",
+    label: "Presentation",
+    detail: "Next.js Page / Component",
+    x: 24,
+    y: 24,
+    fillClass: "fill-chart-1/15",
+    strokeClass: "stroke-chart-1",
+    textClass: "fill-chart-1",
+  },
+  {
+    id: "application",
+    label: "Application",
+    detail: "UseCase / Result<T,E>",
+    x: 244,
+    y: 24,
+    fillClass: "fill-chart-2/15",
+    strokeClass: "stroke-chart-2",
+    textClass: "fill-chart-2",
+  },
+  {
+    id: "domain",
+    label: "Domain",
+    detail: "Entity / VO / Repository I/F",
+    x: 464,
+    y: 24,
+    fillClass: "fill-primary/15",
+    strokeClass: "stroke-primary",
+    textClass: "fill-primary",
+  },
+] as const;
+
+// Clean Architecture × Feature Firstの依存の向きを示す図。
+// Presentation→Application→Domainは通常の実行依存（実線）、
+// InfrastructureはDomainが定義したRepository interfaceを実装する依存性逆転（破線）で区別する。
+function ArchitectureDiagram() {
+  return (
+    <svg
+      viewBox="0 0 664 260"
+      role="img"
+      aria-label="Presentation層からApplication層を経てDomain層へ依存する構成。Infrastructure層はDomain層のRepositoryインターフェースを実装する形で依存性が逆転している。"
+      className="h-auto w-full text-muted-foreground"
+    >
+      {ARCHITECTURE_LAYERS.map((layer) => (
+        <g key={layer.id}>
+          <rect
+            x={layer.x}
+            y={layer.y}
+            width={196}
+            height={88}
+            rx={14}
+            className={`${layer.fillClass} ${layer.strokeClass}`}
+            strokeWidth={1.5}
+          />
+          <text x={layer.x + 20} y={layer.y + 36} className={`${layer.textClass} text-base font-semibold`}>
+            {layer.label}
+          </text>
+          <text x={layer.x + 20} y={layer.y + 60} className="fill-current text-xs">
+            {layer.detail}
+          </text>
+        </g>
+      ))}
+
+      {/* Presentation → Application → Domain（実線・実行依存） */}
+      <path d="M224 68 H240" stroke="currentColor" strokeWidth={2} markerEnd="url(#arrow)" />
+      <path d="M444 68 H460" stroke="currentColor" strokeWidth={2} markerEnd="url(#arrow)" />
+
+      {/* Infrastructure（下段） */}
+      <rect x={244} y={172} width={196} height={64} rx={14} className="fill-chart-3/15 stroke-chart-3" strokeWidth={1.5} />
+      <text x={264} y={202} className="fill-chart-3 text-base font-semibold">
+        Infrastructure
+      </text>
+      <text x={264} y={222} className="fill-current text-xs">
+        Repository実装 / Prisma / 外部API
+      </text>
+
+      {/* Infrastructure → Domain（破線・Repository interfaceの実装で依存性逆転） */}
+      <path
+        d="M420 172 C 460 140, 520 100, 562 112"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        strokeDasharray="4 4"
+        markerEnd="url(#arrow-dashed)"
+      />
+      <text x={430} y={158} className="fill-current text-[10px]">
+        Repository interfaceを実装
+      </text>
+
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="currentColor" />
+        </marker>
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+    </svg>
+  );
+}
+
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
@@ -35,6 +137,18 @@ export default function AboutPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>アーキテクチャ</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ArchitectureDiagram />
+          <p className="mt-4 text-sm leading-7 text-muted-foreground">
+            featureごとにPresentation・Application・Domain・Infrastructureの4層に分割しています。UIから見るとPresentation→Application→Domainの順に依存し、最も内側のDomain層は外部技術（DB・LLM API）を一切知りません。DomainがRepositoryのインターフェースを定義し、Infrastructure層がPrisma等でそれを実装することで依存の向きを逆転させ、DB実装を差し替えてもDomain・Applicationのロジックやテストに影響が出ない構成にしています。
+          </p>
+        </CardContent>
+      </Card>
 
       <Card className="mt-6">
         <CardHeader><CardTitle>技術スタック</CardTitle></CardHeader>

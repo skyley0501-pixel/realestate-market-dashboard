@@ -74,7 +74,7 @@ export default async function Home() {
         <div className="relative grid gap-10 lg:grid-cols-[3fr_2fr] lg:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge>Phase 3 完了</Badge>
+              <Badge>Phase 4 完了</Badge>
               <span className="text-sm text-muted-foreground">国土交通省の実取引データ + AI分析</span>
             </div>
             <p className="mt-8 font-mono text-sm tracking-widest text-muted-foreground">
@@ -127,7 +127,7 @@ export default async function Home() {
               データを見る5つの入口
             </h2>
           </div>
-          <span className="hidden text-sm text-muted-foreground sm:block">Phase 1–3 / Day 1–44</span>
+          <span className="hidden text-sm text-muted-foreground sm:block">Phase 1–4 / Day 1–52</span>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature) => {
@@ -164,7 +164,7 @@ export default async function Home() {
       <section className="border-t pt-10">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <TrendingUp className="size-4" aria-hidden="true" />
-          <span>Phase 4: UI改善を進行中</span>
+          <span>Phase 4: UI改善 完了 / 次はPhase 5: リリース（認証・個人化機能）</span>
         </div>
       </section>
     </div>
