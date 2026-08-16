@@ -78,7 +78,7 @@ export default async function Home() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[15%_45%]"
+          className="scale-110 object-cover object-center translate-x-[-5cm]"
         />
         <div className="absolute inset-0 bg-background/80" />
       </div>
