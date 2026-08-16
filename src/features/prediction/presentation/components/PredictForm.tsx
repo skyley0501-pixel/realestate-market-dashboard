@@ -120,7 +120,12 @@ export function PredictForm() {
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange} disabled={!prefectureCode}>
-                <SelectTrigger id="municipalityCode" className="w-full">
+                <SelectTrigger
+                  id="municipalityCode"
+                  className="w-full"
+                  aria-invalid={!!errors.municipalityCode}
+                  aria-describedby={errors.municipalityCode ? "municipalityCode-error" : undefined}
+                >
                   <SelectValue placeholder={!prefectureCode ? "都道府県を選択" : "選択してください"}>
                     {(value: string | null) => municipalities.find((m) => m.code === value)?.name}
                   </SelectValue>
@@ -135,19 +140,45 @@ export function PredictForm() {
               </Select>
             )}
           />
-          {errors.municipalityCode && <p className="text-xs text-destructive">{errors.municipalityCode.message}</p>}
+          {errors.municipalityCode && (
+            <p id="municipalityCode-error" className="text-xs text-destructive">
+              {errors.municipalityCode.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="areaSqm">面積（㎡）</Label>
-          <Input id="areaSqm" placeholder="例: 40" inputMode="decimal" {...register("areaSqm")} />
-          {errors.areaSqm && <p className="text-xs text-destructive">{errors.areaSqm.message}</p>}
+          <Input
+            id="areaSqm"
+            placeholder="例: 40"
+            inputMode="decimal"
+            aria-invalid={!!errors.areaSqm}
+            aria-describedby={errors.areaSqm ? "areaSqm-error" : undefined}
+            {...register("areaSqm")}
+          />
+          {errors.areaSqm && (
+            <p id="areaSqm-error" className="text-xs text-destructive">
+              {errors.areaSqm.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="buildingAgeYears">築年数</Label>
-          <Input id="buildingAgeYears" placeholder="例: 10" inputMode="numeric" {...register("buildingAgeYears")} />
-          {errors.buildingAgeYears && <p className="text-xs text-destructive">{errors.buildingAgeYears.message}</p>}
+          <Input
+            id="buildingAgeYears"
+            placeholder="例: 10"
+            inputMode="numeric"
+            aria-invalid={!!errors.buildingAgeYears}
+            aria-describedby={errors.buildingAgeYears ? "buildingAgeYears-error" : undefined}
+            {...register("buildingAgeYears")}
+          />
+          {errors.buildingAgeYears && (
+            <p id="buildingAgeYears-error" className="text-xs text-destructive">
+              {errors.buildingAgeYears.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -156,13 +187,17 @@ export function PredictForm() {
             id="timeToStationMinutes"
             placeholder="例: 8"
             inputMode="numeric"
+            aria-invalid={!!errors.timeToStationMinutes}
+            aria-describedby={errors.timeToStationMinutes ? "timeToStationMinutes-error" : undefined}
             {...register("timeToStationMinutes")}
           />
           <p className="text-xs text-muted-foreground">
             ※ データ提供元（国土交通省 不動産情報ライブラリ）に駅距離の実測データが含まれないため、この項目は実データに基づかない参考値として扱われます。
           </p>
           {errors.timeToStationMinutes && (
-            <p className="text-xs text-destructive">{errors.timeToStationMinutes.message}</p>
+            <p id="timeToStationMinutes-error" className="text-xs text-destructive">
+              {errors.timeToStationMinutes.message}
+            </p>
           )}
         </div>
 
@@ -172,7 +207,11 @@ export function PredictForm() {
       </form>
 
       <div>
-        {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
+        {errorMessage && (
+          <p role="alert" className="text-sm text-destructive">
+            {errorMessage}
+          </p>
+        )}
         {result && <PredictResultCard result={result} />}
         {!result && !errorMessage && (
           <p className="text-sm text-muted-foreground">左のフォームに条件を入力して予測してください。</p>

@@ -168,3 +168,9 @@
     animation-duration: 0.01s;
   }
 }
+
+/* MapLibreの地図帰属表示リンクは既定で色のみによる区別（下線なし）のため、WCAG 1.4.1対応で下線を補う。
+   maplibre-gl.cssが後から読み込まれ同詳細度のtext-decoration: noneで上書きしてくるため!importantが必要 */
+.maplibregl-ctrl-attrib a {
+  text-decoration: underline !important;
+}

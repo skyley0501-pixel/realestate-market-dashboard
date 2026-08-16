@@ -121,7 +121,11 @@ export function ChatWindow() {
         )}
       </div>
 
-      {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
+      {errorMessage && (
+        <p role="alert" className="text-sm text-destructive">
+          {errorMessage}
+        </p>
+      )}
 
       <form
         onSubmit={(e) => {
