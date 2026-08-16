@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AnalysisNavDropdown } from "./AnalysisNavDropdown";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV_LINKS = [
   { href: "/", label: "ホーム" },
@@ -35,6 +36,7 @@ export function Header() {
             </li>
           </ul>
         </nav>
+        <ThemeToggle />
       </div>
     </header>
   );
