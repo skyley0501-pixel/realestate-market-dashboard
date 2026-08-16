@@ -1,23 +1,17 @@
 import Link from "next/link";
 import { AnalysisNavDropdown } from "./AnalysisNavDropdown";
+import { MobileNav } from "./MobileNav";
+import { NAV_LINKS } from "./nav-links";
 import { ThemeToggle } from "./ThemeToggle";
-
-const NAV_LINKS = [
-  { href: "/", label: "ホーム" },
-  { href: "/dashboard", label: "ダッシュボード" },
-  { href: "/transactions", label: "取引検索" },
-  { href: "/ai/predict", label: "価格予測" },
-  { href: "/ai/chat", label: "AIチャット" },
-] as const;
 
 export function Header() {
   return (
     <header className="border-b">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:h-14 sm:py-0">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 md:h-14 md:py-0">
         <Link href="/" className="whitespace-nowrap font-semibold">
           REMDA
         </Link>
-        <nav aria-label="メインナビゲーション">
+        <nav aria-label="メインナビゲーション" className="hidden md:block">
           <ul className="flex items-center gap-4 text-sm">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
@@ -36,7 +30,10 @@ export function Header() {
             </li>
           </ul>
         </nav>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <MobileNav />
+        </div>
       </div>
     </header>
   );

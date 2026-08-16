@@ -8,13 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
-
-const ANALYSIS_LINKS = [
-  { href: "/areas", label: "エリアランキング" },
-  { href: "/trends", label: "トレンド分析" },
-  { href: "/areas/compare", label: "エリア比較" },
-  { href: "/map", label: "マーケットマップ" },
-] as const;
+import { ANALYSIS_LINKS } from "./nav-links";
 
 export function AnalysisNavDropdown() {
   return (
