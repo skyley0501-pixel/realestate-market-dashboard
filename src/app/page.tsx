@@ -97,7 +97,7 @@ export default async function Home() {
               </p>
               <h1 className="mt-3 max-w-xl text-4xl font-bold tracking-tight sm:text-5xl">
                 首都圏の不動産市場を、
-                <br />
+                <br className="hidden sm:inline" />
                 データとAIで読む。
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
