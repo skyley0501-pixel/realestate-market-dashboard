@@ -1,6 +1,6 @@
 # REMDA — Real Estate Market Dashboard
 
-首都圏（東京都・神奈川県・千葉県・埼玉県）の不動産市場を、国土交通省「不動産情報ライブラリ」の実取引データから検索・比較・可視化するWebアプリケーションです。
+関東1都3県（東京都・神奈川県・千葉県・埼玉県）の不動産市場を、国土交通省「不動産情報ライブラリ」の実取引データから検索・比較・可視化するWebアプリケーションです。
 
 [デモを見る](https://realestate-market-dashboard.vercel.app/) · [設計書](./docs/design.md) · [ロードマップ](./docs/roadmap.md) · [ADR](./docs/adr/)
 
