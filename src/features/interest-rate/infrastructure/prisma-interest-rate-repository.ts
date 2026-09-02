@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import { JgbYield } from "../domain/entities/jgb-yield";
 import { PolicyRate } from "../domain/entities/policy-rate";
+import { RateNews, type RateNewsSource } from "../domain/entities/rate-news";
 import type { InterestRateRepository } from "../domain/repositories/interest-rate-repository";
 
 export class PrismaInterestRateRepository implements InterestRateRepository {
@@ -29,5 +30,17 @@ export class PrismaInterestRateRepository implements InterestRateRepository {
   async findLatestPolicyRate(): Promise<PolicyRate | null> {
     const row = await this.prisma.policyRate.findFirst({ orderBy: { effectiveDate: "desc" } });
     return row ? PolicyRate.create({ effectiveDate: row.effectiveDate, ratePercent: row.ratePercent, note: row.note }) : null;
+  }
+
+  async findLatestRateNews(limit: number): Promise<RateNews[]> {
+    const rows = await this.prisma.rateNews.findMany({ orderBy: { publishedAt: "desc" }, take: limit });
+    return rows.map((row) =>
+      RateNews.create({
+        source: row.source as RateNewsSource,
+        title: row.title,
+        url: row.url,
+        publishedAt: row.publishedAt,
+      }),
+    );
   }
 }

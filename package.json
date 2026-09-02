@@ -16,6 +16,7 @@
     "db:aggregate": "tsx scripts/aggregate-area-statistics.ts",
     "fetch:jgb-yields": "tsx scripts/fetch-jgb-yields.ts",
     "seed:policy-rates": "tsx scripts/seed-policy-rates.ts",
+    "fetch:rate-news": "tsx scripts/fetch-rate-news.ts",
     "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:integration": "vitest run integration"
   },
@@ -30,6 +31,7 @@
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fast-xml-parser": "^5.11.1",
     "lucide-react": "^1.26.0",
     "maplibre-gl": "^6.1.0",
     "next": "16.2.11",

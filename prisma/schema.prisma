@@ -161,3 +161,19 @@ model PolicyRate {
   @@unique([effectiveDate])
   @@map("policy_rates")
 }
+
+// 金融政策の一次情報源（日銀・FRB公式RSS）から取得した見出し。本文は保持せず、
+// 見出し・発表元サイトへのリンク・公開日のみを保存する（著作権配慮のため転載しない）。
+// scripts/fetch-rate-news.tsで定期取得し、既存分はurlの一致で重複を避ける。
+model RateNews {
+  id          String   @id @default(cuid())
+  source      String // "boj" | "frb"
+  title       String
+  url         String
+  publishedAt DateTime @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([url])
+  @@index([publishedAt])
+  @@map("rate_news")
+}

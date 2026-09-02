@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { interestRateContainer } from "@/features/interest-rate/infrastructure/container";
 import { InterestRateChart } from "@/features/interest-rate/presentation/components/InterestRateChart";
+import { RateNewsList } from "@/features/interest-rate/presentation/components/RateNewsList";
 import { toInterestRateTrendDto } from "@/features/interest-rate/presentation/mappers/interest-rate-trend.mapper";
 
 export default async function RatesPage() {
@@ -61,6 +62,18 @@ export default async function RatesPage() {
 
               <p className="mt-4 text-xs text-muted-foreground">
                 データ出典: 財務省「国債金利情報」、日本銀行金融政策決定会合発表資料
+              </p>
+
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>金融政策関連ニュース</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RateNewsList news={dto.rateNews} />
+                </CardContent>
+              </Card>
+              <p className="mt-2 text-xs text-muted-foreground">
+                日本銀行・FRB（米国連邦準備制度理事会）の公式発表の見出しです。詳細はリンク先の発表元サイトをご覧ください。
               </p>
             </>
           );
