@@ -14,6 +14,8 @@
     "fetch:reinfolib": "node scripts/fetch-reinfolib.ts",
     "db:seed": "prisma db seed",
     "db:aggregate": "tsx scripts/aggregate-area-statistics.ts",
+    "fetch:jgb-yields": "tsx scripts/fetch-jgb-yields.ts",
+    "seed:policy-rates": "tsx scripts/seed-policy-rates.ts",
     "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:integration": "vitest run integration"
   },

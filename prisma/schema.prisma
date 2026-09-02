@@ -136,3 +136,28 @@ model ChatMessage {
   @@index([sessionId])
   @@map("chat_messages")
 }
+
+// 日本国債の利回り（財務省「国債金利情報」由来、日次）。固定金利型住宅ローンとの連動を見るための指標。
+// scripts/fetch-jgb-yields.tsで財務省CSVを取得し洗い替えする。
+model JgbYield {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  tenYearRate Float    @map("ten_year_rate") // 10年債利回り（%）
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([date])
+  @@map("jgb_yields")
+}
+
+// 日銀の政策金利（無担保コールレート翌日物の誘導目標水準）。金融政策決定会合ごとにしか変わらない
+// 階段状のデータのため、自動取得ではなく会合結果を都度手動で追加する運用とする。
+model PolicyRate {
+  id            String   @id @default(cuid())
+  effectiveDate DateTime @map("effective_date") @db.Date // この金利が適用され始めた日
+  ratePercent   Float    @map("rate_percent")
+  note          String? // 例: "2026年9月 金融政策決定会合"
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@unique([effectiveDate])
+  @@map("policy_rates")
+}
