@@ -28,41 +28,49 @@ export function InterestRateChart({ trend }: InterestRateChartProps) {
   });
 
   return (
-    <Line
-      data={{
-        labels,
-        datasets: [
-          {
-            label: "国債10年利回り（%）",
-            data: trend.jgbYields.map((y) => y.tenYearRate),
-            borderColor: theme.line,
-            backgroundColor: theme.line,
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.1,
+    // aspectRatioに任せると狭い画面幅では高さが極端に小さくなり潰れて見えるため、
+    // コンテナ側で最低限の高さを確保したうえでmaintainAspectRatio: falseにする
+    <div className="h-64 sm:h-80">
+      <Line
+        data={{
+          labels,
+          datasets: [
+            {
+              label: "国債10年利回り（%）",
+              data: trend.jgbYields.map((y) => y.tenYearRate),
+              borderColor: theme.line,
+              backgroundColor: theme.line,
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.1,
+            },
+            {
+              label: "日銀政策金利（%）",
+              data: policyRateSeries,
+              borderColor: POLICY_RATE_COLOR,
+              backgroundColor: POLICY_RATE_COLOR,
+              borderWidth: 2,
+              pointRadius: 0,
+              stepped: true,
+            },
+          ],
+        }}
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom", labels: { color: theme.text } },
+            tooltip: chartTooltipStyle(theme),
           },
-          {
-            label: "日銀政策金利（%）",
-            data: policyRateSeries,
-            borderColor: POLICY_RATE_COLOR,
-            backgroundColor: POLICY_RATE_COLOR,
-            borderWidth: 2,
-            pointRadius: 0,
-            stepped: true,
+          scales: {
+            x: {
+              ticks: { color: theme.text, maxTicksLimit: 6, maxRotation: 0, autoSkip: true },
+              grid: { color: theme.grid },
+            },
+            y: { ticks: { color: theme.text, callback: (value) => `${value}%` }, grid: { color: theme.grid } },
           },
-        ],
-      }}
-      options={{
-        responsive: true,
-        plugins: {
-          legend: { position: "bottom", labels: { color: theme.text } },
-          tooltip: chartTooltipStyle(theme),
-        },
-        scales: {
-          x: { ticks: { color: theme.text, maxTicksLimit: 12 }, grid: { color: theme.grid } },
-          y: { ticks: { color: theme.text, callback: (value) => `${value}%` }, grid: { color: theme.grid } },
-        },
-      }}
-    />
+        }}
+      />
+    </div>
   );
 }
