@@ -152,6 +152,8 @@
 |---|---|---|---|---|
 | 71 | 金利動向ページの追加 | 長期金利上昇局面を踏まえ、財務省「国債金利情報」CSVから国債10年利回りを取得するバッチ、日銀政策金利の手動シード、両者を重ねたグラフを表示する`/rates`ページを追加 | 金利推移グラフが表示され、本番でも実データが確認できる | `feat(interest-rate): add JGB 10-year yield and BOJ policy rate tracking` |
 | 72 | ナビゲーション再編 | 「金利動向」が「エリア分析」に混在していると分かりにくいとのフィードバックを受け、「関連情報」ドロップダウンを新設して分離 | 「関連情報」タブから金利動向へ遷移できる | `refactor(nav): split rates into a new "関連情報" dropdown` |
+| 73 | 金融政策ニュース見出しの追加 | 日銀・FRB公式RSSから金融政策決定会合・FOMC関連の見出しを取得し、`/rates`ページに一覧表示。本文は転載せず見出し・リンク・日付のみ保持 | 日銀・FRBのニュース見出しが表示され、本番でも実データが確認できる | `feat(interest-rate): add monetary policy news headlines from BOJ and FRB` |
+| 74 | 金利チャートのモバイル対応 | モバイル幅でチャートが潰れて見えるフィードバックを受け、コンテナに明示的な高さを設定し`maintainAspectRatio: false`に変更、X軸ラベル数を調整 | モバイル幅でもグラフが十分な高さで表示される | `fix(ui): prevent interest rate chart from collapsing on mobile` |
 
 **Phase 7完了条件**: なし（計画外の追加機能を随時記録し続けるフェーズのため、固定の完了条件は設けない）。
 
