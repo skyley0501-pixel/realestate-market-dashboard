@@ -11,5 +11,6 @@ export const ANALYSIS_LINKS = [
   { href: "/trends", label: "トレンド分析" },
   { href: "/areas/compare", label: "エリア比較" },
   { href: "/map", label: "マーケットマップ" },
-  { href: "/rates", label: "金利動向" },
 ] as const;
+
+export const RELATED_INFO_LINKS = [{ href: "/rates", label: "金利動向" }] as const;

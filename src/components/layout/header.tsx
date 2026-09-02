@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { AnalysisNavDropdown } from "./AnalysisNavDropdown";
 import { MobileNav } from "./MobileNav";
-import { NAV_LINKS } from "./nav-links";
+import { NavDropdown } from "./NavDropdown";
+import { ANALYSIS_LINKS, NAV_LINKS, RELATED_INFO_LINKS } from "./nav-links";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
@@ -21,7 +21,10 @@ export function Header() {
               </li>
             ))}
             <li>
-              <AnalysisNavDropdown />
+              <NavDropdown label="エリア分析" links={ANALYSIS_LINKS} />
+            </li>
+            <li>
+              <NavDropdown label="関連情報" links={RELATED_INFO_LINKS} />
             </li>
             <li>
               <Link href="/about" className="hover:underline">

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 import Link from "next/link";
-import { ANALYSIS_LINKS, NAV_LINKS } from "./nav-links";
+import { ANALYSIS_LINKS, NAV_LINKS, RELATED_INFO_LINKS } from "./nav-links";
 
 // md未満（モバイル・タブレット幅）でのみ表示するハンバーガーメニュー。md以上ではHeader側の横並びnavが表示される。
 export function MobileNav() {
@@ -33,6 +33,15 @@ export function MobileNav() {
         <DropdownMenuGroup>
           <DropdownMenuLabel>エリア分析</DropdownMenuLabel>
           {ANALYSIS_LINKS.map((link) => (
+            <DropdownMenuLinkItem key={link.href} closeOnClick render={<Link href={link.href} />}>
+              {link.label}
+            </DropdownMenuLinkItem>
+          ))}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>関連情報</DropdownMenuLabel>
+          {RELATED_INFO_LINKS.map((link) => (
             <DropdownMenuLinkItem key={link.href} closeOnClick render={<Link href={link.href} />}>
               {link.label}
             </DropdownMenuLinkItem>
