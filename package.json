@@ -17,6 +17,9 @@
     "fetch:jgb-yields": "tsx scripts/fetch-jgb-yields.ts",
     "seed:policy-rates": "tsx scripts/seed-policy-rates.ts",
     "fetch:rate-news": "tsx scripts/fetch-rate-news.ts",
+    "seed:municipality-centroids": "tsx scripts/seed-municipality-centroids.ts",
+    "fetch:hazard-zones": "tsx scripts/fetch-hazard-zones.ts",
+    "fetch:disaster-history": "tsx scripts/fetch-disaster-history.ts",
     "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:integration": "vitest run integration"
   },

@@ -23,14 +23,20 @@ model Prefecture {
 
 // 市区町村マスタ（JIS X 0402 市区町村コード、5桁）
 model Municipality {
-  code           String     @id
-  name           String
-  prefectureCode String        @map("prefecture_code")
-  prefecture     Prefecture    @relation(fields: [prefectureCode], references: [code])
-  stations       Station[]
-  transactions   Transaction[]
-  areaStatistics AreaStatistics[]
-  aiAreaReports  AiAreaReport[]
+  code             String            @id
+  name             String
+  prefectureCode   String            @map("prefecture_code")
+  prefecture       Prefecture        @relation(fields: [prefectureCode], references: [code])
+  // 区域の代表点（形状の重心）。ハザード判定APIがタイル座標指定のため、
+  // scripts/seed-municipality-centroids.tsでpublic/geo/kanto-municipalities.geojsonから算出して埋める
+  latitude         Float?
+  longitude        Float?
+  stations         Station[]
+  transactions     Transaction[]
+  areaStatistics   AreaStatistics[]
+  aiAreaReports    AiAreaReport[]
+  hazardZone       HazardZone?
+  disasterHistories DisasterHistory[]
 
   @@map("municipalities")
 }
@@ -176,4 +182,37 @@ model RateNews {
   @@unique([url])
   @@index([publishedAt])
   @@map("rate_news")
+}
+
+// 市区町村単位の水害・土砂災害リスク該当有無（国交省「不動産情報ライブラリ」防災情報API由来）。
+// 市区町村代表点を中心にした複数タイルのうち1件でも区域が見つかれば該当ありとする簡易判定
+// （区域が代表点から離れた場所にしか無いケースは拾えない可能性がある。粗い傾向把握が目的）。
+// scripts/fetch-hazard-zones.tsで定期的に洗い替えする。
+model HazardZone {
+  id               String       @id @default(cuid())
+  municipalityCode String       @unique @map("municipality_code")
+  municipality     Municipality @relation(fields: [municipalityCode], references: [code])
+  floodZone        Boolean      @map("flood_zone") // 洪水浸水想定区域（想定最大規模）
+  landslideZone    Boolean      @map("landslide_zone") // 土砂災害警戒区域
+  checkedAt        DateTime     @default(now()) @map("checked_at")
+
+  @@map("hazard_zones")
+}
+
+// 市区町村単位の過去の水害・土砂災害履歴（国交省「不動産情報ライブラリ」防災情報API・国土調査由来）。
+// がけ崩れ・地すべり・土石流・浸水・堤防決壊等が対象。本文は保持せず、種別・発生日・出典のみを保存する。
+// scripts/fetch-disaster-history.tsで定期取得し、既存分は(municipalityCode, disasterTypeCode, occurredOn)で重複を避ける。
+model DisasterHistory {
+  id               String       @id @default(cuid())
+  municipalityCode String       @map("municipality_code")
+  municipality     Municipality @relation(fields: [municipalityCode], references: [code])
+  disasterTypeCode String       @map("disaster_type_code") // 例: "24"（土石流）
+  disasterName     String       @map("disaster_name") // 例: "土石流"
+  occurredOn       DateTime     @map("occurred_on") @db.Date
+  source           String? // 資料名
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  @@unique([municipalityCode, disasterTypeCode, occurredOn])
+  @@index([municipalityCode])
+  @@map("disaster_histories")
 }
