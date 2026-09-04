@@ -20,6 +20,7 @@
     "seed:municipality-centroids": "tsx scripts/seed-municipality-centroids.ts",
     "fetch:hazard-zones": "tsx scripts/fetch-hazard-zones.ts",
     "fetch:disaster-history": "tsx scripts/fetch-disaster-history.ts",
+    "fetch:gsi-disaster-events": "tsx scripts/fetch-gsi-disaster-events.ts",
     "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:integration": "vitest run integration"
   },
@@ -29,8 +30,10 @@
     "@hookform/resolvers": "^5.4.2",
     "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "^7.9.0",
+    "@types/adm-zip": "^0.5.8",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.2",
+    "adm-zip": "^0.6.0",
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
