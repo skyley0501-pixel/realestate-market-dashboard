@@ -29,7 +29,7 @@ export interface DisasterHistoryMapProps {
   histories: DisasterHistoryDto[];
 }
 
-function toFeatureCollection(histories: DisasterHistoryDto[]) {
+export function toFeatureCollection(histories: DisasterHistoryDto[]) {
   return {
     type: "FeatureCollection" as const,
     features: histories
@@ -42,6 +42,9 @@ function toFeatureCollection(histories: DisasterHistoryDto[]) {
           disasterTypeCode: h.disasterTypeCode,
           disasterName: h.disasterName,
           occurredOn: h.occurredOn,
+          // レイヤーのfilterで使う。["geometry-type"]式のサポート状況に依存しないよう、
+          // フィーチャー作成時点でgeometry.typeをプロパティとして複製しておく
+          geometryType: (h.geometry as { type: string }).type,
         },
       })),
   };
@@ -83,7 +86,7 @@ export function DisasterHistoryMap({ center, histories }: DisasterHistoryMapProp
         id: "disaster-points",
         type: "circle",
         source: HISTORY_SOURCE_ID,
-        filter: ["==", ["geometry-type"], "Point"],
+        filter: ["==", ["get", "geometryType"], "Point"],
         paint: {
           "circle-radius": 6,
           "circle-color": FEATURE_COLOR,
@@ -97,14 +100,14 @@ export function DisasterHistoryMap({ center, histories }: DisasterHistoryMapProp
         id: "disaster-polygons-fill",
         type: "fill",
         source: HISTORY_SOURCE_ID,
-        filter: ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]],
+        filter: ["in", ["get", "geometryType"], ["literal", ["Polygon", "MultiPolygon"]]],
         paint: { "fill-color": FEATURE_COLOR, "fill-opacity": 0.35 },
       });
       map.addLayer({
         id: "disaster-polygons-outline",
         type: "line",
         source: HISTORY_SOURCE_ID,
-        filter: ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]],
+        filter: ["in", ["get", "geometryType"], ["literal", ["Polygon", "MultiPolygon"]]],
         paint: { "line-color": FEATURE_COLOR, "line-width": 1 },
       });
 
