@@ -175,10 +175,12 @@ async function main() {
       await prisma.disasterHistory.deleteMany({ where: { id: { in: staleIds } } });
     }
 
+    // recordsは同じ(disasterTypeCode, occurredOn)の組み合わせを含みうる（同一災害の複数区画）ため、
+    // 実際にDBへ保存されるユニーク件数はkeepKeys.sizeで数える
     processed++;
-    totalSaved += records.length;
+    totalSaved += keepKeys.size;
     console.log(
-      `[${processed}/${municipalities.length}] ${m.name}: 取得${fetched.length}件 -> 区域内${records.length}件` +
+      `[${processed}/${municipalities.length}] ${m.name}: 取得${fetched.length}件 -> 区域内保存${keepKeys.size}件` +
         (staleIds.length > 0 ? `（区域外${staleIds.length}件を削除）` : ""),
     );
   }
