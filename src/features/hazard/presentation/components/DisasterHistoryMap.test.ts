@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DisasterHistoryDto } from "../mappers/area-hazard-info.mapper";
-import { toFeatureCollection } from "./DisasterHistoryMap";
+import { toCentroidFeatureCollection, toFeatureCollection } from "./DisasterHistoryMap";
 
 function buildHistory(overrides: Partial<DisasterHistoryDto> = {}): DisasterHistoryDto {
   return {
@@ -45,5 +45,45 @@ describe("toFeatureCollection", () => {
       disasterName: "土石流",
       occurredOn: "1991-06-03",
     });
+  });
+});
+
+describe("toCentroidFeatureCollection", () => {
+  // 実際の被害範囲ポリゴンは数十m四方など極小で、初期ズームでは塗りつぶしが視認できないため、
+  // ズームに関わらず見える円マーカー用にPolygonの中心点を求める
+  it("Polygonはバウンディングボックスの中心点をPoint Featureとして返す", () => {
+    const result = toCentroidFeatureCollection([
+      buildHistory({
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [139.0, 35.0],
+              [139.2, 35.0],
+              [139.2, 35.4],
+              [139.0, 35.4],
+              [139.0, 35.0],
+            ],
+          ],
+        },
+      }),
+    ]);
+
+    expect(result.features).toHaveLength(1);
+    expect(result.features[0].geometry).toEqual({ type: "Point", coordinates: [139.1, 35.2] });
+  });
+
+  it("Pointはそのままの座標を使う", () => {
+    const result = toCentroidFeatureCollection([
+      buildHistory({ geometry: { type: "Point", coordinates: [139.5, 35.5] } }),
+    ]);
+
+    expect(result.features[0].geometry).toEqual({ type: "Point", coordinates: [139.5, 35.5] });
+  });
+
+  it("geometryがnullの履歴は除外する", () => {
+    const result = toCentroidFeatureCollection([buildHistory({ geometry: null })]);
+
+    expect(result.features).toHaveLength(0);
   });
 });
