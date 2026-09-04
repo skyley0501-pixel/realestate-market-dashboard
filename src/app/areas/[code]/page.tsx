@@ -9,6 +9,7 @@ import { hazardContainer } from "@/features/hazard/infrastructure/container";
 import { toAreaHazardInfoDto } from "@/features/hazard/presentation/mappers/area-hazard-info.mapper";
 import { HazardZoneBadges } from "@/features/hazard/presentation/components/HazardZoneBadges";
 import { DisasterHistoryList } from "@/features/hazard/presentation/components/DisasterHistoryList";
+import { DisasterHistoryMap } from "@/features/hazard/presentation/components/DisasterHistoryMap";
 import { PriceTrendChart } from "@/shared/ui/components/charts/PriceTrendChart";
 import { notFound } from "next/navigation";
 
@@ -50,7 +51,11 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ cod
         () => [],
       );
       const floorPlanSummary = summarizeFloorPlans(transactions.map((t) => t.floorPlan));
-      const hazardInfo = hazardResult.match(toAreaHazardInfoDto, () => ({ hazardZone: null, disasterHistories: [] }));
+      const hazardInfo = hazardResult.match(toAreaHazardInfoDto, () => ({
+        hazardZone: null,
+        disasterHistories: [],
+        center: null,
+      }));
 
       return (
         <div className="mx-auto max-w-5xl px-4 py-8">
@@ -81,6 +86,11 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ cod
 
           <section>
             <h2 className="mb-4 text-lg font-semibold">過去の水害・土砂災害履歴</h2>
+            {hazardInfo.center && hazardInfo.disasterHistories.length > 0 && (
+              <div className="mb-4">
+                <DisasterHistoryMap center={hazardInfo.center} histories={hazardInfo.disasterHistories} />
+              </div>
+            )}
             <DisasterHistoryList histories={hazardInfo.disasterHistories} />
           </section>
         </div>

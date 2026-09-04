@@ -1,5 +1,5 @@
 import type { AreaHazardInfo } from "../../application/use-cases/get-area-hazard-info.usecase";
-import type { DisasterHistory } from "../../domain/entities/disaster-history";
+import type { DisasterGeometry, DisasterHistory } from "../../domain/entities/disaster-history";
 import type { HazardZone } from "../../domain/entities/hazard-zone";
 
 export interface HazardZoneDto {
@@ -13,11 +13,18 @@ export interface DisasterHistoryDto {
   disasterName: string;
   occurredOn: string; // YYYY-MM-DD
   source: string | null;
+  geometry: DisasterGeometry | null;
+}
+
+export interface MunicipalityCenterDto {
+  latitude: number;
+  longitude: number;
 }
 
 export interface AreaHazardInfoDto {
   hazardZone: HazardZoneDto | null;
   disasterHistories: DisasterHistoryDto[];
+  center: MunicipalityCenterDto | null;
 }
 
 function toDateOnly(date: Date): string {
@@ -34,6 +41,7 @@ function toDisasterHistoryDto(history: DisasterHistory): DisasterHistoryDto {
     disasterName: history.disasterName,
     occurredOn: toDateOnly(history.occurredOn),
     source: history.source,
+    geometry: history.geometry,
   };
 }
 
@@ -41,5 +49,6 @@ export function toAreaHazardInfoDto(info: AreaHazardInfo): AreaHazardInfoDto {
   return {
     hazardZone: info.hazardZone ? toHazardZoneDto(info.hazardZone) : null,
     disasterHistories: info.disasterHistories.map(toDisasterHistoryDto),
+    center: info.center,
   };
 }

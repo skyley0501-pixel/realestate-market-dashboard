@@ -200,7 +200,7 @@ model HazardZone {
 }
 
 // 市区町村単位の過去の水害・土砂災害履歴（国交省「不動産情報ライブラリ」防災情報API・国土調査由来）。
-// がけ崩れ・地すべり・土石流・浸水・堤防決壊等が対象。本文は保持せず、種別・発生日・出典のみを保存する。
+// がけ崩れ・地すべり・土石流・浸水・堤防決壊等が対象。本文は保持せず、種別・発生日・出典・被害範囲の図形のみを保存する。
 // scripts/fetch-disaster-history.tsで定期取得し、既存分は(municipalityCode, disasterTypeCode, occurredOn)で重複を避ける。
 model DisasterHistory {
   id               String       @id @default(cuid())
@@ -210,6 +210,9 @@ model DisasterHistory {
   disasterName     String       @map("disaster_name") // 例: "土石流"
   occurredOn       DateTime     @map("occurred_on") @db.Date
   source           String? // 資料名
+  // 被害範囲を示すGeoJSON Geometry（Point: がけ崩れ等の地点、Polygon/MultiPolygon: 浸水域等の範囲）。
+  // APIレスポンスをそのまま保持し、地図表示時にtypeで描画方法を出し分ける
+  geometry         Json?
   createdAt        DateTime     @default(now()) @map("created_at")
 
   @@unique([municipalityCode, disasterTypeCode, occurredOn])

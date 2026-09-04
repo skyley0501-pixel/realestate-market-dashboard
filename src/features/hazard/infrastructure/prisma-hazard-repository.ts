@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@/generated/prisma/client";
-import { DisasterHistory } from "../domain/entities/disaster-history";
+import { DisasterHistory, type DisasterGeometry } from "../domain/entities/disaster-history";
 import { HazardZone } from "../domain/entities/hazard-zone";
-import type { HazardRepository } from "../domain/repositories/hazard-repository";
+import type { HazardRepository, MunicipalityCenter } from "../domain/repositories/hazard-repository";
 
 export class PrismaHazardRepository implements HazardRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -25,7 +25,18 @@ export class PrismaHazardRepository implements HazardRepository {
         disasterName: row.disasterName,
         occurredOn: row.occurredOn,
         source: row.source,
+        geometry: (row.geometry as DisasterGeometry | null) ?? null,
       }),
     );
+  }
+
+  async findMunicipalityCenter(municipalityCode: string): Promise<MunicipalityCenter | null> {
+    const row = await this.prisma.municipality.findUnique({
+      where: { code: municipalityCode },
+      select: { latitude: true, longitude: true },
+    });
+    return row?.latitude != null && row.longitude != null
+      ? { latitude: row.latitude, longitude: row.longitude }
+      : null;
   }
 }

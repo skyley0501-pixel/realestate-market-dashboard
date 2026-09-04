@@ -6,7 +6,7 @@
 // 市区町村の代表点を中心にした3x3タイル（z=12, 1タイル約9.8km四方）で取得する。
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../src/generated/prisma/client.ts";
+import { Prisma, PrismaClient } from "../src/generated/prisma/client.ts";
 import { lonLatToTile, surroundingTiles } from "./geo-tile-utils.ts";
 import { fetchHazardTileFeatures } from "./reinfolib-hazard-client.ts";
 
@@ -24,6 +24,9 @@ interface DisasterHistoryFeatureProps {
   disaster_date?: string; // "YYYYMMDD"
   disaster_source?: string;
 }
+
+// APIレスポンスの被害範囲図形。種別によりPoint（がけ崩れ等の地点）とPolygon/MultiPolygon（浸水域等の範囲）が混在する
+type DisasterGeometry = { type: string; coordinates: unknown } | null;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -44,6 +47,7 @@ interface DisasterRecord {
   disasterName: string;
   occurredOn: Date;
   source: string | null;
+  geometry: DisasterGeometry;
 }
 
 async function fetchDisasterRecords(lon: number, lat: number, apiKey: string): Promise<DisasterRecord[]> {
@@ -65,6 +69,7 @@ async function fetchDisasterRecords(lon: number, lat: number, apiKey: string): P
         disasterName: props.disaster_name_ja,
         occurredOn,
         source: props.disaster_source ?? null,
+        geometry: (feature.geometry as DisasterGeometry) ?? null,
       });
     }
   }
@@ -102,8 +107,16 @@ async function main() {
             occurredOn: record.occurredOn,
           },
         },
-        create: { municipalityCode: m.code, ...record },
-        update: { disasterName: record.disasterName, source: record.source },
+        create: {
+          municipalityCode: m.code,
+          ...record,
+          geometry: (record.geometry as Prisma.InputJsonValue | undefined) ?? undefined,
+        },
+        update: {
+          disasterName: record.disasterName,
+          source: record.source,
+          geometry: (record.geometry as Prisma.InputJsonValue | undefined) ?? undefined,
+        },
       });
     }
 

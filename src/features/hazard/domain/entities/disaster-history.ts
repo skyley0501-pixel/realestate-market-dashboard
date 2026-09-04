@@ -1,8 +1,15 @@
+// 被害範囲を示すGeoJSON Geometry。Point（がけ崩れ等の地点）とPolygon/MultiPolygon（浸水域等の範囲）が混在する
+export interface DisasterGeometry {
+  type: string;
+  coordinates: unknown;
+}
+
 export interface DisasterHistoryProps {
   disasterTypeCode: string;
   disasterName: string;
   occurredOn: Date;
   source: string | null;
+  geometry: DisasterGeometry | null;
 }
 
 // 過去に発生した水害・土砂災害の履歴1件を表すEntity（国土調査「土地履歴調査」由来）。
@@ -28,5 +35,9 @@ export class DisasterHistory {
 
   get source(): string | null {
     return this.props.source;
+  }
+
+  get geometry(): DisasterGeometry | null {
+    return this.props.geometry;
   }
 }

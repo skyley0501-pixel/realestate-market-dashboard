@@ -22,7 +22,16 @@ export function buildHazardTileUrl(apiId: string, tile: TileCoord, extraParams?:
   return url.toString();
 }
 
-// 該当タイル内に区域・履歴が無い場合は404で返るケースがあるため、その場合は空featuresとして扱う
+const MAX_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 1000; // 1秒→2秒→4秒の指数バックオフ
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// 該当タイル内に区域・履歴が無い場合は404で返るケースがあるため、その場合は空featuresとして扱う。
+// DNS解決失敗・接続タイムアウト等の一時的なネットワークエラーは最大MAX_RETRIES回まで再試行する
+// （117市区町村×複数タイルの大量リクエストのため、瞬断で処理全体を止めないようにする）。
 export async function fetchHazardTileFeatures(
   apiId: string,
   tile: TileCoord,
@@ -30,15 +39,27 @@ export async function fetchHazardTileFeatures(
   extraParams?: Record<string, string>,
 ): Promise<GeoJsonFeatureCollection["features"]> {
   const url = buildHazardTileUrl(apiId, tile, extraParams);
-  const res = await fetch(url, {
-    headers: { "Ocp-Apim-Subscription-Key": apiKey },
-  });
-  if (res.status === 404) {
-    return [];
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { "Ocp-Apim-Subscription-Key": apiKey },
+      });
+      if (res.status === 404) {
+        return [];
+      }
+      if (!res.ok) {
+        throw new Error(`reinfolib hazard API error: ${res.status} ${res.statusText} (${url})`);
+      }
+      const body = (await res.json()) as GeoJsonFeatureCollection;
+      return body.features ?? [];
+    } catch (error) {
+      if (attempt === MAX_RETRIES) throw error;
+      const delay = RETRY_BASE_DELAY_MS * 2 ** attempt;
+      console.warn(`  [リトライ ${attempt + 1}/${MAX_RETRIES}] ${url}: ${String(error)}（${delay}ms待機）`);
+      await sleep(delay);
+    }
   }
-  if (!res.ok) {
-    throw new Error(`reinfolib hazard API error: ${res.status} ${res.statusText} (${url})`);
-  }
-  const body = (await res.json()) as GeoJsonFeatureCollection;
-  return body.features ?? [];
+
+  throw new Error("unreachable");
 }
