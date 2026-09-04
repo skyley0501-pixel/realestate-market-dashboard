@@ -156,7 +156,7 @@
 | 74 | 金利チャートのモバイル対応 | モバイル幅でチャートが潰れて見えるフィードバックを受け、コンテナに明示的な高さを設定し`maintainAspectRatio: false`に変更、X軸ラベル数を調整 | モバイル幅でもグラフが十分な高さで表示される | `fix(ui): prevent interest rate chart from collapsing on mobile` |
 | 75 | 水害・土砂災害ハザード機能の追加 | 台風・線状降水帯による水害リスクの高まりを踏まえ、国交省「不動産情報ライブラリ」防災情報API（洪水浸水想定区域・土砂災害警戒区域・国土調査災害履歴）から市区町村単位の該当有無と過去の水害・土砂災害履歴を取得し、エリア詳細ページに表示 | エリア詳細ページに防災情報セクションが表示され、本番でも実データが確認できる | `feat(hazard): add flood and landslide risk info to area detail page` |
 | 76 | 災害履歴の地図表示 | 「区内のどこで発生したか分かるようにしたい」との要望を受け、災害履歴に被害範囲のGeoJSON Geometryを保存し、エリア詳細ページの小地図に土砂系/水系で色分けして重ね表示。あわせて防災情報API取得バッチに一時的なネットワークエラー用のリトライ（最大3回、指数バックオフ）を追加 | 地図上に被害範囲が表示され、本番でも実データが確認できる | `feat(hazard): show disaster history extent on a map` |
-| 77 | 災害履歴レイヤーの表示不具合修正 | 本番で地図は表示されるが点・面のレイヤーが描画されないとのフィードバックを受け、MapLibreの`["geometry-type"]`式に依存していたfilterを、フィーチャー作成時に`properties.geometryType`へ複製し`["get", "geometryType"]`で判定する確実な方式に修正。ロジックの単体テストを追加 | 地図上に点・面のレイヤーが色分けされて表示される | `fix(hazard): render point/polygon disaster history layers reliably` |
+| 77 | 災害履歴レイヤーの表示不具合修正 | 本番で地図は表示されるが点・面のレイヤーが描画されないとのフィードバックを受け対応。(1) MapLibreの`["geometry-type"]`式に依存していたfilterを`properties.geometryType`＋`["get", ...]`の確実な方式に変更 (2) 実データを調査すると被害範囲ポリゴンが数十m四方など極小で初期ズームでは視認できないと判明し、ズームに関わらず見える中心点マーカー（centroidレイヤー）を追加 (3) ポップアップ文字がページのダークテーマ色を引き継ぎ白飛びしていたため濃色を明示指定。ロジックの単体テストを追加 | 地図上に色分けされたマーカーが表示され、クリックで内容が読める | `fix(hazard): render point/polygon disaster history layers reliably` / `fix(hazard): add always-visible centroid markers for tiny disaster polygons` / `fix(hazard): fix hard-to-read popup text color on disaster history map` |
 
 **Phase 7完了条件**: なし（計画外の追加機能を随時記録し続けるフェーズのため、固定の完了条件は設けない）。
 
