@@ -27,8 +27,7 @@ export function DisasterHistoryList({ histories }: DisasterHistoryListProps) {
         ))}
       </ul>
       <p className="text-xs text-muted-foreground">
-        出典: 国土交通省「不動産情報ライブラリ」（国土調査「土地履歴調査」データ）。
-        エリア代表地点の周辺で記録された履歴のため、隣接エリアの資料が含まれる場合があります。
+        出典: 国土交通省「不動産情報ライブラリ」（国土調査「土地履歴調査」データ）
       </p>
     </div>
   );

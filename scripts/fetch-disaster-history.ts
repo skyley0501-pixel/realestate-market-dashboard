@@ -3,12 +3,20 @@
 // 実行例: npm run fetch:disaster-history
 //
 // 対象は水害・土砂災害関連の種別のみ（地震・津波・液状化は今回のスコープ外）。
-// 市区町村の代表点を中心にした3x3タイル（z=12, 1タイル約9.8km四方）で取得する。
+// 市区町村の代表点を中心にした3x3タイル（z=12, 1タイル約9.8km四方）で取得するため、
+// 面積の小さい市区町村では隣接エリアのデータまで拾ってしまう。そこで取得後、
+// public/geo/kanto-municipalities.geojsonの区域ポリゴンを使い、実際にその市区町村の
+// 区域内にある履歴だけに絞り込む（洗い替え）。
 import "dotenv/config";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma, PrismaClient } from "../src/generated/prisma/client.ts";
+import { centroidOf, isPointInGeometry } from "../src/shared/domain/geo/geometry-utils.ts";
 import { lonLatToTile, surroundingTiles } from "./geo-tile-utils.ts";
 import { fetchHazardTileFeatures } from "./reinfolib-hazard-client.ts";
+
+const GEOJSON_PATH = path.join(process.cwd(), "public", "geo", "kanto-municipalities.geojson");
 
 const ZOOM = 12;
 const TILE_RADIUS = 1; // 3x3タイル
@@ -77,11 +85,43 @@ async function fetchDisasterRecords(lon: number, lat: number, apiKey: string): P
   return records;
 }
 
+interface MunicipalityFeature {
+  properties: Record<string, unknown>;
+  geometry: GeoJSON.Geometry;
+}
+
+// N03_007（市区町村コード）→区域ポリゴンのマップを構築する
+async function loadMunicipalityGeometries(): Promise<Map<string, GeoJSON.Geometry>> {
+  const raw = await readFile(GEOJSON_PATH, "utf-8");
+  const geo = JSON.parse(raw) as { features: MunicipalityFeature[] };
+  const map = new Map<string, GeoJSON.Geometry>();
+  for (const feature of geo.features) {
+    const code = feature.properties.N03_007;
+    if (typeof code === "string" && code !== "") {
+      map.set(code, feature.geometry);
+    }
+  }
+  return map;
+}
+
+// 取得したレコードのうち、代表点（Pointはそのまま、Polygon/MultiPolygonは中心）が
+// 実際にその市区町村の区域内にあるものだけを残す。区域データが無い場合は絞り込まず全件を返す
+function filterRecordsWithinMunicipality(records: DisasterRecord[], municipalityGeometry?: GeoJSON.Geometry) {
+  if (!municipalityGeometry) return records;
+  return records.filter((record) => {
+    if (!record.geometry) return false;
+    const point = centroidOf(record.geometry as unknown as GeoJSON.Geometry);
+    return point !== null && isPointInGeometry(point, municipalityGeometry);
+  });
+}
+
 async function main() {
   const apiKey = process.env.REINFOLIB_API_KEY;
   if (!apiKey) {
     throw new Error("REINFOLIB_API_KEY が未設定です。.env に設定してください。");
   }
+
+  const municipalityGeometries = await loadMunicipalityGeometries();
 
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
   const prisma = new PrismaClient({ adapter });
@@ -96,7 +136,8 @@ async function main() {
   let processed = 0;
   let totalSaved = 0;
   for (const m of municipalities) {
-    const records = await fetchDisasterRecords(m.longitude!, m.latitude!, apiKey);
+    const fetched = await fetchDisasterRecords(m.longitude!, m.latitude!, apiKey);
+    const records = filterRecordsWithinMunicipality(fetched, municipalityGeometries.get(m.code));
 
     for (const record of records) {
       await prisma.disasterHistory.upsert({
@@ -120,9 +161,26 @@ async function main() {
       });
     }
 
+    // 洗い替え: 今回区域外と判定されたものを含め、今回のfetchで得られなかった
+    // 既存レコードをこの市区町村分から削除する（隣接エリアの誤登録データの掃除）
+    const keepKeys = new Set(records.map((r) => `${r.disasterTypeCode}_${r.occurredOn.toISOString()}`));
+    const existing = await prisma.disasterHistory.findMany({
+      where: { municipalityCode: m.code },
+      select: { id: true, disasterTypeCode: true, occurredOn: true },
+    });
+    const staleIds = existing
+      .filter((e) => !keepKeys.has(`${e.disasterTypeCode}_${e.occurredOn.toISOString()}`))
+      .map((e) => e.id);
+    if (staleIds.length > 0) {
+      await prisma.disasterHistory.deleteMany({ where: { id: { in: staleIds } } });
+    }
+
     processed++;
     totalSaved += records.length;
-    console.log(`[${processed}/${municipalities.length}] ${m.name}: ${records.length}件`);
+    console.log(
+      `[${processed}/${municipalities.length}] ${m.name}: 取得${fetched.length}件 -> 区域内${records.length}件` +
+        (staleIds.length > 0 ? `（区域外${staleIds.length}件を削除）` : ""),
+    );
   }
 
   console.log(`完了（延べ${totalSaved}件処理、重複はupsertで統合済み）`);

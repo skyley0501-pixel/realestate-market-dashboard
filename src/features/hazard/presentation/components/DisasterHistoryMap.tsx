@@ -4,6 +4,7 @@ import type { ExpressionSpecification, GeoJSONSource } from "maplibre-gl";
 import { Map as MapLibreMap, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef } from "react";
+import { centroidOf } from "@/shared/domain/geo/geometry-utils";
 import type { DisasterHistoryDto, MunicipalityCenterDto } from "../mappers/area-hazard-info.mapper";
 
 const INITIAL_ZOOM = 11; // fetch-disaster-history.tsのタイル取得ズーム(z=12)に合わせ、市区町村全体が収まる程度
@@ -60,36 +61,6 @@ export function toFeatureCollection(histories: DisasterHistoryDto[]) {
         properties: toProperties(h),
       })),
   };
-}
-
-// Point/Polygon/MultiPolygonの全頂点からバウンディングボックス中心を求める。
-// APIの被害範囲ポリゴンは数十m四方など極端に小さいものが多く、初期ズームでは塗りつぶしが
-// 視認できないため、ズームに関わらず見える円マーカー（centroidレイヤー）の座標として使う。
-function centroidOf(geometry: GeoJSON.Geometry): [number, number] | null {
-  let positions: [number, number][];
-  if (geometry.type === "Point") {
-    return geometry.coordinates as [number, number];
-  }
-  if (geometry.type === "Polygon") {
-    positions = geometry.coordinates.flat() as [number, number][];
-  } else if (geometry.type === "MultiPolygon") {
-    positions = geometry.coordinates.flat(2) as [number, number][];
-  } else {
-    return null;
-  }
-  if (positions.length === 0) return null;
-
-  let minLon = Infinity;
-  let maxLon = -Infinity;
-  let minLat = Infinity;
-  let maxLat = -Infinity;
-  for (const [lon, lat] of positions) {
-    if (lon < minLon) minLon = lon;
-    if (lon > maxLon) maxLon = lon;
-    if (lat < minLat) minLat = lat;
-    if (lat > maxLat) maxLat = lat;
-  }
-  return [(minLon + maxLon) / 2, (minLat + maxLat) / 2];
 }
 
 export function toCentroidFeatureCollection(histories: DisasterHistoryDto[]) {
