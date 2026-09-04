@@ -174,9 +174,12 @@ export function DisasterHistoryMap({ center, histories }: DisasterHistoryMapProp
           const feature = e.features?.[0];
           if (!feature) return;
           const { disasterName, occurredOn } = feature.properties as { disasterName: string; occurredOn: string };
+          // ページ全体のダークテーマ文字色を引き継いで白飛びしないよう、ポップアップ内は明示的に濃色を指定する
           new Popup()
             .setLngLat(e.lngLat)
-            .setHTML(`<strong>${disasterName}</strong><br>${occurredOn}`)
+            .setHTML(
+              `<div style="color:#1f2937"><strong>${disasterName}</strong><br>${occurredOn}</div>`,
+            )
             .addTo(map);
         });
         map.on("mouseenter", layerId, () => {
