@@ -4,8 +4,12 @@ export function formatYen(priceYen: string | number): string {
   return `${BigInt(Math.round(Number(priceYen))).toLocaleString("ja-JP")}円`;
 }
 
+export function toTsuboPrice(avgUnitPriceYenPerSqm: number): number {
+  return Math.round(avgUnitPriceYenPerSqm * SQM_PER_TSUBO);
+}
+
 export function formatTsuboPrice(avgUnitPriceYenPerSqm: number): string {
-  return `${Math.round(avgUnitPriceYenPerSqm * SQM_PER_TSUBO).toLocaleString("ja-JP")}円/坪`;
+  return `${toTsuboPrice(avgUnitPriceYenPerSqm).toLocaleString("ja-JP")}円/坪`;
 }
 
 export function trendColorClass(trendRatePercent: number | null): string {

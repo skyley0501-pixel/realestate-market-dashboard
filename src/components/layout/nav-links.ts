@@ -7,8 +7,7 @@ export const NAV_LINKS = [
 
 export const ANALYSIS_LINKS = [
   { href: "/areas", label: "エリアランキング" },
-  { href: "/trends", label: "トレンド分析" },
-  { href: "/areas/compare", label: "エリア比較" },
+  { href: "/trends", label: "エリア比較" },
   { href: "/map", label: "マーケットマップ" },
 ] as const;
 

@@ -30,8 +30,8 @@ const FEATURES = [
     icon: BarChart3,
   },
   {
-    title: "推移を見る",
-    description: "複数エリアを選んで、価格推移を折れ線グラフで比較します。",
+    title: "エリア比較",
+    description: "複数エリアを選んで、取引件数・坪単価・中央値の推移を折れ線グラフで比較します。",
     href: "/trends",
     icon: TrendingUp,
   },

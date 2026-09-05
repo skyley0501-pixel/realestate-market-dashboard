@@ -6,7 +6,12 @@ export function groupByArea(history: AreaMarketSnapshot[]): TrendSeries[] {
   const seriesByCode = new Map<string, TrendSeries>();
   for (const snapshot of history) {
     const dto = toAreaSnapshotDto(snapshot);
-    const point = { period: dto.period, medianPriceYen: Number(dto.medianPriceYen) };
+    const point = {
+      period: dto.period,
+      medianPriceYen: Number(dto.medianPriceYen),
+      avgUnitPriceYenPerSqm: dto.avgUnitPriceYenPerSqm,
+      transactionCount: dto.transactionCount,
+    };
     const existing = seriesByCode.get(dto.code);
     if (existing) {
       existing.points.push(point);

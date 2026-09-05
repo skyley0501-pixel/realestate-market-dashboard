@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { marketContainer } from "@/features/market/infrastructure/container";
 import { AreaMultiSelector } from "@/features/market/presentation/components/AreaMultiSelector";
 import { groupByArea } from "@/features/market/presentation/lib/trend-grouping";
@@ -21,7 +22,7 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">トレンド分析</h1>
+      <h1 className="mb-6 text-2xl font-bold">エリア比較</h1>
 
       <AreaMultiSelector areas={areas} selectedCodes={codes} min={MIN_TREND_AREAS} max={MAX_TREND_AREAS} href="/trends" />
 
@@ -30,12 +31,37 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
           (history) => {
             const series = groupByArea(history);
             return series.length > 0 ? (
-              <TrendComparisonChart series={series} />
+              <div className="mt-6 space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>取引件数</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TrendComparisonChart series={series} metric="transactionCount" unit="件" />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>平均坪単価</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TrendComparisonChart series={series} metric="avgUnitPriceYenPerSqm" unit="円/坪" />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>中央値</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TrendComparisonChart series={series} metric="medianPriceYen" unit="円" />
+                  </CardContent>
+                </Card>
+              </div>
             ) : (
-              <p className="text-muted-foreground">選択したエリアのデータがまだありません。</p>
+              <p className="mt-6 text-muted-foreground">選択したエリアのデータがまだありません。</p>
             );
           },
-          (error) => <p className="text-destructive">{error.userMessage}</p>,
+          (error) => <p className="mt-6 text-destructive">{error.userMessage}</p>,
         )}
     </div>
   );
