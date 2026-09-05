@@ -4,6 +4,10 @@ import { toDisasterHistoryDtos } from "@/features/hazard/presentation/mappers/ar
 import { HeatmapLegend } from "@/shared/ui/components/map/HeatmapLegend";
 import { MarketMap } from "@/shared/ui/components/map/MarketMap";
 
+// DisasterHistoryは手動実行のバッチ・削除でのみ更新されるため、
+// ビルド時の静的生成に固定されないよう毎回DBから取得する
+export const dynamic = "force-dynamic";
+
 export default async function MapPage() {
   const disasterHistoryResult = await hazardContainer.getRegionDisasterHistoryUseCase().execute();
 
