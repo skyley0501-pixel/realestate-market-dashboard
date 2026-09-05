@@ -172,7 +172,7 @@ export default function AboutPage() {
       <div className="mt-10 border-t pt-6 text-xs leading-6 text-muted-foreground">
         <p className="font-medium text-foreground">© 2026 skyley. All rights reserved.</p>
         <p className="mt-2 max-w-3xl">
-          本サイトのソースコード・UI/UXデザイン等の著作権は著作者に帰属します。GitHubでの公開は転職活動における技術力提示を目的とするものであり、利用許諾（オープンソースライセンスの付与）を意味しません。無断での複製・転用・改変およびこれらに基づく類似サービスの構築は、著作権法（第21条・第27条等）に抵触するおそれがあります。引用・参照を超える利用をご希望の場合は、事前に
+          本サイトのソースコード・UI/UXデザイン等の著作権は著作者に帰属します。GitHubでの公開は利用許諾（オープンソースライセンスの付与）を意味しません。無断での複製・転用・改変およびこれらに基づく類似サービスの構築は、著作権法（第21条・第27条等）に抵触するおそれがあります。引用・参照を超える利用をご希望の場合は、事前に
           <a href="mailto:skyley0501@gmail.com" className="underline underline-offset-2 hover:text-foreground">
             skyley0501@gmail.com
           </a>
