@@ -9,7 +9,7 @@ export default async function MapPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">マーケットマップ</h1>
+      <h1 className="mb-6 text-2xl font-bold">坪単価ヒートマップ</h1>
       <MarketMap />
       <HeatmapLegend />
       <p className="mt-4 text-xs text-muted-foreground">
