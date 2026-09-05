@@ -65,8 +65,15 @@ async function main() {
       });
     }
 
-    const result = await prisma.transaction.createMany({ data: transactions });
-    console.log(`Transactionを${result.count}件投入しました。`);
+    const BATCH_SIZE = 5000;
+    let inserted = 0;
+    for (let i = 0; i < transactions.length; i += BATCH_SIZE) {
+      const batch = transactions.slice(i, i + BATCH_SIZE);
+      const result = await prisma.transaction.createMany({ data: batch });
+      inserted += result.count;
+      console.log(`  投入済み: ${inserted}/${transactions.length}件`);
+    }
+    console.log(`Transactionを${inserted}件投入しました。`);
   } finally {
     await prisma.$disconnect();
   }

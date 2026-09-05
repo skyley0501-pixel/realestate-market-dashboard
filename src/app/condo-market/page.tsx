@@ -4,6 +4,10 @@ import { CondoMarketChart } from "@/features/condo-market/presentation/component
 import { CondoSupplyChart } from "@/features/condo-market/presentation/components/CondoSupplyChart";
 import { toCondoMarketTrendDto } from "@/features/condo-market/presentation/mappers/condo-market-trend.mapper";
 
+// CondoSupplyStat/CondoMarketStatは手動実行の集計バッチでのみ更新されるため、
+// ビルド時の静的生成に固定されないよう毎回DBから取得する
+export const dynamic = "force-dynamic";
+
 export default async function CondoMarketPage() {
   const result = await condoMarketContainer.getCondoMarketTrendUseCase().execute();
 
