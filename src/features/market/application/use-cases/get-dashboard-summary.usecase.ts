@@ -3,6 +3,7 @@ import { Result } from "@/shared/application/result";
 import type { AreaRepository } from "../../domain/repositories/area-repository";
 
 export interface DashboardSummary {
+  latestPeriod: string | null;
   areaCount: number;
   totalTransactionCount: number;
   avgUnitPriceYenPerSqm: number;
@@ -23,6 +24,7 @@ export class GetDashboardSummaryUseCase {
 
       if (snapshots.length === 0) {
         return Result.ok({
+          latestPeriod: null,
           areaCount: 0,
           totalTransactionCount: 0,
           avgUnitPriceYenPerSqm: 0,
@@ -36,6 +38,7 @@ export class GetDashboardSummaryUseCase {
         .filter((v): v is number => v !== null && v !== undefined);
 
       return Result.ok({
+        latestPeriod: snapshots[0].period,
         areaCount: snapshots.length,
         totalTransactionCount: snapshots.reduce((sum, s) => sum + s.transactionCount, 0),
         avgUnitPriceYenPerSqm: average(snapshots.map((s) => s.avgUnitPriceYenPerSqm)),

@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { marketContainer } from "@/features/market/infrastructure/container";
 import { StatCard } from "@/features/market/presentation/components/StatCard";
-import { formatTrendText, formatTsuboPrice, formatYen, trendColorClass } from "@/features/market/presentation/lib/format";
+import {
+  formatPeriodLabel,
+  formatTrendText,
+  formatTsuboPrice,
+  formatYen,
+  trendColorClass,
+} from "@/features/market/presentation/lib/format";
 import { ArrowRight, BarChart3, Map, MessageCircle, Search, Sparkles, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -181,6 +187,45 @@ export default async function Home() {
             Clean ArchitectureとDDDを軽量に適用し、統計計算・LLM呼び出しをUIやDBから分離しています。IQR法による外れ値除去、事前集計、型安全なエラー処理、LLM出力の検証をテストで確認し、実データとAIを組み合わせる際の再現性と保守性を重視しました。
           </p>
         </section>
+
+        {summaryResult.match(
+          (summary) =>
+            summary.latestPeriod && (
+              <section className="border-t pt-10 pb-10">
+                <p className="font-mono text-xs tracking-widest text-muted-foreground">ABOUT THIS DATA</p>
+                <h2 className="mt-2 text-xl font-semibold">統計データについて</h2>
+                <p className="mt-4 text-sm text-muted-foreground">
+                  上記の統計は<strong className="text-foreground">{formatPeriodLabel(summary.latestPeriod)}（速報値）</strong>
+                  時点のものです。国土交通省データの反映状況により、直近期間は今後の値の見直しで変動する場合があります。
+                </p>
+                <ul className="mt-4 space-y-2 text-sm leading-6 text-muted-foreground">
+                  <li>
+                    <strong className="text-foreground">対象エリア数</strong>
+                    ：{formatPeriodLabel(summary.latestPeriod)}に取引実績があった市区町村の数。
+                  </li>
+                  <li>
+                    <strong className="text-foreground">取引総数</strong>
+                    ：{formatPeriodLabel(summary.latestPeriod)}
+                    （1四半期分）の取引件数の合計。データベース全体の累計件数ではありません。
+                  </li>
+                  <li>
+                    <strong className="text-foreground">平均坪単価</strong>
+                    ：各市区町村内の全取引について「価格÷面積」を算出し、市区町村ごとに平均（外れ値除去なし）した上で、
+                    さらに全エリアで平均した値。
+                  </li>
+                  <li>
+                    <strong className="text-foreground">平均前期比</strong>
+                    ：各市区町村の中央値（外れ値除去後）を1つ前の四半期の中央値と比べた変化率を、全エリアで平均した値。
+                  </li>
+                  <li>
+                    <strong className="text-foreground">平均中央値</strong>
+                    ：各市区町村の取引価格の中央値（外れ値除去後）を、全エリアで平均した値。
+                  </li>
+                </ul>
+              </section>
+            ),
+          () => null,
+        )}
 
         <section className="border-t pt-10">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

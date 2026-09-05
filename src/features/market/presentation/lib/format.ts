@@ -20,3 +20,18 @@ export function formatTrendText(trendRatePercent: number | null): string {
   const sign = trendRatePercent > 0 ? "+" : "";
   return `${sign}${trendRatePercent.toFixed(1)}%`;
 }
+
+const QUARTER_MONTH_RANGES: Record<string, string> = {
+  "1": "1〜3月",
+  "2": "4〜6月",
+  "3": "7〜9月",
+  "4": "10〜12月",
+};
+
+// "2026Q1" -> "2026年1〜3月期"
+export function formatPeriodLabel(period: string): string {
+  const match = period.match(/^(\d{4})Q([1-4])$/);
+  if (!match) return period;
+  const [, year, quarter] = match;
+  return `${year}年${QUARTER_MONTH_RANGES[quarter]}期`;
+}

@@ -55,6 +55,7 @@ describe("GetDashboardSummaryUseCase", () => {
 
     result.match(
       (summary) => {
+        expect(summary.latestPeriod).toBe("2025Q4");
         expect(summary.areaCount).toBe(3);
         expect(summary.totalTransactionCount).toBe(350);
         expect(summary.avgUnitPriceYenPerSqm).toBeCloseTo(1_500_000);
@@ -91,6 +92,7 @@ describe("GetDashboardSummaryUseCase", () => {
 
     result.match(
       (summary) => {
+        expect(summary.latestPeriod).toBeNull();
         expect(summary.areaCount).toBe(0);
         expect(summary.totalTransactionCount).toBe(0);
         expect(summary.avgUnitPriceYenPerSqm).toBe(0);
