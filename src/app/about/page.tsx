@@ -170,7 +170,7 @@ export default function AboutPage() {
       </Card>
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button render={<Link href="/dashboard" />}>ダッシュボードを見る</Button>
+        <Button render={<Link href="/" />}>ホームへ戻る</Button>
         <Button variant="outline" render={<a href="https://github.com/skyley0501-pixel/realestate-market-dashboard/blob/main/docs/design.md" target="_blank" rel="noopener noreferrer" />}>設計書を見る</Button>
       </div>
     </div>

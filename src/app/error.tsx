@@ -16,14 +16,14 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       <AlertTriangle className="size-10 text-destructive" aria-hidden="true" />
       <h1 className="mt-6 text-2xl font-bold">問題が発生しました</h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        ページの表示中にエラーが発生しました。しばらくしてから再度お試しいただくか、ダッシュボードへお戻りください。
+        ページの表示中にエラーが発生しました。しばらくしてから再度お試しいただくか、ホームへお戻りください。
       </p>
       <div className="mt-8 flex gap-3">
         <Button onClick={() => reset()}>
           <RotateCw /> 再試行する
         </Button>
-        <Button variant="outline" render={<Link href="/dashboard" />}>
-          ダッシュボードへ戻る
+        <Button variant="outline" render={<Link href="/" />}>
+          ホームへ戻る
         </Button>
       </div>
     </div>

@@ -19,9 +19,15 @@ const FEATURES = [
   },
   {
     title: "市場を比べる",
-    description: "市区町村ごとの価格推移、坪単価ランキング、複数エリア比較を確認します。",
+    description: "市区町村ごとの坪単価ランキング、複数エリア比較を確認します。",
     href: "/areas",
     icon: BarChart3,
+  },
+  {
+    title: "推移を見る",
+    description: "複数エリアを選んで、価格推移を折れ線グラフで比較します。",
+    href: "/trends",
+    icon: TrendingUp,
   },
   {
     title: "地図で見る",
@@ -104,8 +110,8 @@ export default async function Home() {
                 {TARGET_AREAS.join("・")}を対象に、取引検索・統計比較・地図・AI講評/チャット/価格予測までを一つにまとめた市場分析ダッシュボードです。
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button render={<Link href="/dashboard" />}>
-                  ダッシュボードを見る <ArrowRight />
+                <Button render={<Link href="/transactions" />}>
+                  取引を探す <ArrowRight />
                 </Button>
                 <Button variant="outline" render={<Link href="/about" />}>
                   設計と開発背景
@@ -139,7 +145,7 @@ export default async function Home() {
             <div>
               <p className="font-mono text-xs tracking-widest text-muted-foreground">ANALYSIS WORKFLOW</p>
               <h2 id="features-heading" className="mt-2 text-2xl font-semibold">
-                データを見る5つの入口
+                データを見る6つの入口
               </h2>
             </div>
             <span className="hidden text-sm text-muted-foreground sm:block">Phase 1–4 / Day 1–52</span>

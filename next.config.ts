@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      // ダッシュボードページはトレンド分析・マーケットマップと内容が重複していたため統合・削除。
+      // 既存のブックマーク・外部リンクからのアクセスはホームへ誘導する
+      { source: "/dashboard", destination: "/", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
