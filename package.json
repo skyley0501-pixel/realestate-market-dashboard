@@ -21,6 +21,8 @@
     "fetch:hazard-zones": "tsx scripts/fetch-hazard-zones.ts",
     "fetch:disaster-history": "tsx scripts/fetch-disaster-history.ts",
     "fetch:gsi-disaster-events": "tsx scripts/fetch-gsi-disaster-events.ts",
+    "fetch:condo-supply": "tsx scripts/fetch-condo-supply.ts",
+    "aggregate:condo-market": "tsx scripts/aggregate-condo-market-stats.ts",
     "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:integration": "vitest run integration"
   },

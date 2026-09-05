@@ -12,4 +12,7 @@ export const ANALYSIS_LINKS = [
   { href: "/map", label: "マーケットマップ" },
 ] as const;
 
-export const RELATED_INFO_LINKS = [{ href: "/rates", label: "金利動向" }] as const;
+export const RELATED_INFO_LINKS = [
+  { href: "/rates", label: "金利動向" },
+  { href: "/condo-market", label: "マンション市場動向" },
+] as const;

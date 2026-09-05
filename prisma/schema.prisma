@@ -14,9 +14,11 @@ datasource db {
 
 // 都道府県マスタ（JIS X 0401 都道府県コード、2桁）
 model Prefecture {
-  code           String         @id
-  name           String
-  municipalities Municipality[]
+  code             String            @id
+  name             String
+  municipalities   Municipality[]
+  condoSupplyStats CondoSupplyStat[]
+  condoMarketStats CondoMarketStat[]
 
   @@map("prefectures")
 }
@@ -218,4 +220,39 @@ model DisasterHistory {
   @@unique([municipalityCode, disasterTypeCode, occurredOn])
   @@index([municipalityCode])
   @@map("disaster_histories")
+}
+
+// 新築分譲マンションの着工戸数（国交省「建築着工統計調査」由来、都道府県別・年度）。
+// 統計表「利用関係別 構造別 建て方別 都道府県別 戸数」を「建て方=共同住宅」×「利用関係=分譲住宅」で
+// 絞り込んだ値。年1回、確定年度分が追加される。scripts/fetch-condo-supply.tsで洗い替えする。
+model CondoSupplyStat {
+  id             String     @id @default(cuid())
+  prefectureCode String     @map("prefecture_code")
+  prefecture     Prefecture @relation(fields: [prefectureCode], references: [code])
+  fiscalYear     Int        @map("fiscal_year") // 例: 2023（2023年度）
+  unitsStarted   Int        @map("units_started") // 新設分譲共同住宅の着工戸数
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  @@unique([prefectureCode, fiscalYear])
+  @@map("condo_supply_stats")
+}
+
+// 都道府県別・四半期別の中古マンション取引統計（REMDA自身の実取引データから集計、IQR外れ値除去済み）。
+// propertyType="中古マンション等"のTransactionを都道府県単位に集約する。
+// 既存のAreaStatistics（市区町村単位）とは別に、都道府県単位の中央値を正しく算出するため
+// Transactionから都度再計算する。scripts/aggregate-condo-market-stats.tsで洗い替えする。
+model CondoMarketStat {
+  id                String     @id @default(cuid())
+  prefectureCode    String     @map("prefecture_code")
+  prefecture        Prefecture @relation(fields: [prefectureCode], references: [code])
+  period            String // 例: "2024Q3"
+  medianPriceYen    BigInt     @map("median_price_yen")
+  averagePriceYen   BigInt     @map("average_price_yen")
+  sampleSize        Int        @map("sample_size") // 外れ値除去後の件数
+  transactionCount  Int        @map("transaction_count") // 外れ値除去前の元の取引件数
+  calculatedAt      DateTime   @default(now()) @map("calculated_at")
+
+  @@unique([prefectureCode, period])
+  @@index([period])
+  @@map("condo_market_stats")
 }
