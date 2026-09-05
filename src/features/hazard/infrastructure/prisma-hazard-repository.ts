@@ -30,6 +30,19 @@ export class PrismaHazardRepository implements HazardRepository {
     );
   }
 
+  async findAllDisasterHistories(): Promise<DisasterHistory[]> {
+    const rows = await this.prisma.disasterHistory.findMany({ orderBy: { occurredOn: "desc" } });
+    return rows.map((row) =>
+      DisasterHistory.create({
+        disasterTypeCode: row.disasterTypeCode,
+        disasterName: row.disasterName,
+        occurredOn: row.occurredOn,
+        source: row.source,
+        geometry: (row.geometry as DisasterGeometry | null) ?? null,
+      }),
+    );
+  }
+
   async findMunicipalityCenter(municipalityCode: string): Promise<MunicipalityCenter | null> {
     const row = await this.prisma.municipality.findUnique({
       where: { code: municipalityCode },

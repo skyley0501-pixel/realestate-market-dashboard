@@ -17,8 +17,8 @@ const FEATURES = [
     icon: Search,
   },
   {
-    title: "順位を見る",
-    description: "最新期間の取引件数・坪単価・中央値を順位で比較します。",
+    title: "順位で比較する",
+    description: "1都3県の対象市区について、最新期間の取引件数・坪単価・中央値を順位で比較します。",
     href: "/areas",
     icon: BarChart3,
   },

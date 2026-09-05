@@ -35,7 +35,7 @@ function toHazardZoneDto(zone: HazardZone): HazardZoneDto {
   return { floodZone: zone.floodZone, landslideZone: zone.landslideZone, checkedAt: toDateOnly(zone.checkedAt) };
 }
 
-function toDisasterHistoryDto(history: DisasterHistory): DisasterHistoryDto {
+export function toDisasterHistoryDto(history: DisasterHistory): DisasterHistoryDto {
   return {
     disasterTypeCode: history.disasterTypeCode,
     disasterName: history.disasterName,
@@ -43,6 +43,10 @@ function toDisasterHistoryDto(history: DisasterHistory): DisasterHistoryDto {
     source: history.source,
     geometry: history.geometry,
   };
+}
+
+export function toDisasterHistoryDtos(histories: DisasterHistory[]): DisasterHistoryDto[] {
+  return histories.map(toDisasterHistoryDto);
 }
 
 export function toAreaHazardInfoDto(info: AreaHazardInfo): AreaHazardInfoDto {

@@ -12,6 +12,8 @@ export interface HazardRepository {
   findHazardZoneByMunicipality(municipalityCode: string): Promise<HazardZone | null>;
   // 市区町村の過去の水害・土砂災害履歴を発生日降順（新しい順）でlimit件返す
   findDisasterHistoryByMunicipality(municipalityCode: string, limit: number): Promise<DisasterHistory[]>;
+  // 1都3県全域の過去の水害・土砂災害履歴（ハザードマップ表示用）。件数が少ないため全件返す
+  findAllDisasterHistories(): Promise<DisasterHistory[]>;
   // 市区町村の代表点（地図の初期中心に使う）。未設定なら null
   findMunicipalityCenter(municipalityCode: string): Promise<MunicipalityCenter | null>;
 }

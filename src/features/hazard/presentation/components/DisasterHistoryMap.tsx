@@ -1,27 +1,16 @@
 "use client";
 
-import type { ExpressionSpecification, GeoJSONSource } from "maplibre-gl";
+import type { GeoJSONSource } from "maplibre-gl";
 import { Map as MapLibreMap, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef } from "react";
 import { centroidOf } from "@/shared/domain/geo/geometry-utils";
 import type { DisasterHistoryDto, MunicipalityCenterDto } from "../mappers/area-hazard-info.mapper";
+import { FEATURE_COLOR } from "../lib/disaster-map-style";
 
 const INITIAL_ZOOM = 11; // fetch-disaster-history.tsのタイル取得ズーム(z=12)に合わせ、市区町村全体が収まる程度
 const HISTORY_SOURCE_ID = "disaster-histories";
 const CENTROID_SOURCE_ID = "disaster-history-centroids";
-
-// 土砂系（がけ崩れ・地すべり・河道閉塞・土石流）は茶系、水系（浸水・堤防決壊・高潮）は青系で塗り分ける
-const LANDSLIDE_TYPE_CODES = ["21", "22", "23", "24"];
-const LANDSLIDE_COLOR = "#92400e";
-const FLOOD_COLOR = "#1c5cab";
-
-const FEATURE_COLOR: ExpressionSpecification = [
-  "case",
-  ["in", ["get", "disasterTypeCode"], ["literal", LANDSLIDE_TYPE_CODES]],
-  LANDSLIDE_COLOR,
-  FLOOD_COLOR,
-];
 
 // バンドラー環境ではimport.meta.urlベースの既定worker URL解決が空文字列になるため明示的に指定する
 setWorkerUrl("/maplibre-gl-worker.mjs");
