@@ -17,14 +17,14 @@ const FEATURES = [
     icon: Search,
   },
   {
-    title: "市場を比べる",
-    description: "市区町村ごとの坪単価ランキング、複数エリア比較を確認します。",
+    title: "順位を見る",
+    description: "最新期間の取引件数・坪単価・中央値を順位で比較します。",
     href: "/areas",
     icon: BarChart3,
   },
   {
-    title: "エリア比較",
-    description: "複数エリアを選んで、取引件数・坪単価・中央値の推移を折れ線グラフで比較します。",
+    title: "推移で比較する",
+    description: "複数の市区町村を選んで、過去5年間の取引件数・坪単価・中央値の推移を折れ線グラフで比較します。",
     href: "/trends",
     icon: TrendingUp,
   },
