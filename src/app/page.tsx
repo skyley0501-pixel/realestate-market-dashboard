@@ -172,7 +172,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="grid gap-6 border-t pt-10 sm:grid-cols-[1fr_2fr]">
+        <section className="grid gap-6 border-t pt-10 pb-10 sm:grid-cols-[1fr_2fr]">
           <div>
             <p className="font-mono text-xs tracking-widest text-muted-foreground">ENGINEERING</p>
             <h2 className="mt-2 text-xl font-semibold">分析とAIを支える設計</h2>
