@@ -14,6 +14,10 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 const calculator = new MarketStatisticsCalculator();
 
+// 5年累計の取引件数がこの値以下の市区町村は、サンプルが少なく中央値の代表性が低いため
+// 集計・ランキング表示の対象から除外する（生のTransactionデータ自体は削除せず、取引検索では引き続き利用できる）。
+const MIN_TOTAL_TRANSACTIONS = 1000;
+
 // "2025Q3" -> "2025Q2"、"2025Q1" -> "2024Q4" のように直前の四半期キーを求める
 export function previousPeriod(period: string): string {
   const match = period.match(/^(\d{4})Q([1-4])$/);
@@ -66,10 +70,18 @@ async function main() {
     grouped.set(row.municipalityCode, byPeriod);
   }
 
+  const excludedCodes: string[] = [];
+
   let upserted = 0;
   for (const [municipalityCode, byPeriod] of grouped) {
     const municipality = municipalityByCode.get(municipalityCode);
     if (!municipality) continue;
+
+    const totalTransactionCount = [...byPeriod.values()].reduce((sum, txns) => sum + txns.length, 0);
+    if (totalTransactionCount <= MIN_TOTAL_TRANSACTIONS) {
+      excludedCodes.push(municipalityCode);
+      continue;
+    }
 
     const area = Area.create({
       code: municipality.code,
@@ -108,6 +120,14 @@ async function main() {
     }
   }
 
+  if (excludedCodes.length > 0) {
+    const { count } = await prisma.areaStatistics.deleteMany({
+      where: { municipalityCode: { in: excludedCodes } },
+    });
+    console.log(
+      `5年累計${MIN_TOTAL_TRANSACTIONS}件以下のため${excludedCodes.length}市区町村を除外しました（既存のAreaStatistics ${count}件を削除）。`,
+    );
+  }
   console.log(`${upserted}件のAreaStatisticsを集計しました。`);
 }
 
