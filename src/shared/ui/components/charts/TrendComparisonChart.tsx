@@ -64,28 +64,34 @@ export function TrendComparisonChart({ series, metric, unit }: TrendComparisonCh
   });
 
   return (
-    <Line
-      data={{ labels, datasets }}
-      options={{
-        responsive: true,
-        plugins: {
-          legend: { position: "bottom", labels: { color: theme.text } },
-          tooltip: {
-            ...chartTooltipStyle(theme),
-            callbacks: {
-              label: (context) => `${context.dataset.label}: ${Number(context.parsed.y).toLocaleString("ja-JP")}${unit}`,
+    <div className="h-64 sm:h-80">
+      <Line
+        data={{ labels, datasets }}
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom", labels: { color: theme.text } },
+            tooltip: {
+              ...chartTooltipStyle(theme),
+              callbacks: {
+                label: (context) => `${context.dataset.label}: ${Number(context.parsed.y).toLocaleString("ja-JP")}${unit}`,
+              },
             },
           },
-        },
-        scales: {
-          x: { ticks: { color: theme.text }, grid: { color: theme.grid } },
-          y: {
-            beginAtZero: false,
-            ticks: { color: theme.text, callback: (value) => Number(value).toLocaleString("ja-JP") },
-            grid: { color: theme.grid },
+          scales: {
+            x: {
+              ticks: { color: theme.text, maxTicksLimit: 8, maxRotation: 0, autoSkip: true },
+              grid: { color: theme.grid },
+            },
+            y: {
+              beginAtZero: false,
+              ticks: { color: theme.text, callback: (value) => Number(value).toLocaleString("ja-JP") },
+              grid: { color: theme.grid },
+            },
           },
-        },
-      }}
-    />
+        }}
+      />
+    </div>
   );
 }
