@@ -42,7 +42,8 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
                 都道府県別の市場動向
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                港区のような都心部と山間部の町村を同じ平均に混ぜないよう、坪単価・前期比・中央値は都道府県ごとに算出しています。
+                都心部と山間部を同じ平均に混ぜないよう、坪単価・前期比・中央値は<strong className="text-foreground">都道府県ごと</strong>
+                に算出しています。また、5年累計の取引件数が少ない市区町村（統計的な代表性が低いエリア）は、この集計から除外しています。
               </p>
               <div className="mt-6 overflow-x-auto rounded-xl border">
                 <table className="w-full min-w-[560px] text-sm">
@@ -113,10 +114,6 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
                 <li>
                   <strong className="text-foreground">平均中央値</strong>
                   ：各市区町村の取引価格の中央値（外れ値除去後）を、同じ都道府県内のエリアで平均した値。
-                </li>
-                <li>
-                  都心部と郊外・山間部を同じ平均に混ぜないよう、坪単価・前期比・中央値は<strong className="text-foreground">都道府県ごと</strong>
-                  に算出しています。また、5年累計の取引件数が少ない市区町村（統計的な代表性が低いエリア）は、この集計から除外しています。
                 </li>
               </ul>
             </section>
