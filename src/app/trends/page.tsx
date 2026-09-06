@@ -48,27 +48,29 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
                 <table className="w-full min-w-[560px] text-sm">
                   <thead>
                     <tr className="border-b bg-muted/40 text-left text-muted-foreground">
-                      <th className="px-4 py-3 font-medium">都道府県</th>
-                      <th className="px-4 py-3 font-medium">エリア数</th>
-                      <th className="px-4 py-3 font-medium">取引件数</th>
-                      <th className="px-4 py-3 font-medium">平均坪単価</th>
-                      <th className="px-4 py-3 font-medium">平均前期比</th>
-                      <th className="px-4 py-3 font-medium">平均中央値</th>
+                      <th className="whitespace-nowrap px-3 py-3 font-medium">都道府県</th>
+                      <th className="whitespace-nowrap px-3 py-3 font-medium">エリア数</th>
+                      <th className="whitespace-nowrap px-3 py-3 font-medium">取引件数</th>
+                      <th className="whitespace-nowrap px-3 py-3 font-medium">平均坪単価</th>
+                      <th className="whitespace-nowrap px-3 py-3 font-medium">平均前期比</th>
+                      <th className="whitespace-nowrap px-3 py-3 font-medium">平均中央値</th>
                     </tr>
                   </thead>
                   <tbody>
                     {summary.byPrefecture.map((pref) => (
                       <tr key={pref.prefectureCode} className="border-b last:border-b-0">
-                        <td className="px-4 py-3 font-medium">{pref.prefectureName}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{pref.areaCount.toLocaleString("ja-JP")}エリア</td>
-                        <td className="px-4 py-3 text-muted-foreground">
+                        <td className="whitespace-nowrap px-3 py-3 font-medium">{pref.prefectureName}</td>
+                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
+                          {pref.areaCount.toLocaleString("ja-JP")}エリア
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
                           {pref.totalTransactionCount.toLocaleString("ja-JP")}件
                         </td>
-                        <td className="px-4 py-3">{formatTsuboPrice(pref.avgUnitPriceYenPerSqm)}</td>
-                        <td className={`px-4 py-3 ${trendColorClass(pref.avgTrendRatePercent)}`}>
+                        <td className="whitespace-nowrap px-3 py-3">{formatTsuboPrice(pref.avgUnitPriceYenPerSqm)}</td>
+                        <td className={`whitespace-nowrap px-3 py-3 ${trendColorClass(pref.avgTrendRatePercent)}`}>
                           {formatTrendText(pref.avgTrendRatePercent)}
                         </td>
-                        <td className="px-4 py-3">{formatYen(pref.avgMedianPriceYen)}</td>
+                        <td className="whitespace-nowrap px-3 py-3">{formatYen(pref.avgMedianPriceYen)}</td>
                       </tr>
                     ))}
                   </tbody>
