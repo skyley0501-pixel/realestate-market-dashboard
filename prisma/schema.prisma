@@ -25,19 +25,19 @@ model Prefecture {
 
 // 市区町村マスタ（JIS X 0402 市区町村コード、5桁）
 model Municipality {
-  code             String            @id
-  name             String
-  prefectureCode   String            @map("prefecture_code")
-  prefecture       Prefecture        @relation(fields: [prefectureCode], references: [code])
+  code              String            @id
+  name              String
+  prefectureCode    String            @map("prefecture_code")
+  prefecture        Prefecture        @relation(fields: [prefectureCode], references: [code])
   // 区域の代表点（形状の重心）。ハザード判定APIがタイル座標指定のため、
   // scripts/seed-municipality-centroids.tsでpublic/geo/kanto-municipalities.geojsonから算出して埋める
-  latitude         Float?
-  longitude        Float?
-  stations         Station[]
-  transactions     Transaction[]
-  areaStatistics   AreaStatistics[]
-  aiAreaReports    AiAreaReport[]
-  hazardZone       HazardZone?
+  latitude          Float?
+  longitude         Float?
+  stations          Station[]
+  transactions      Transaction[]
+  areaStatistics    AreaStatistics[]
+  aiAreaReports     AiAreaReport[]
+  hazardZone        HazardZone?
   disasterHistories DisasterHistory[]
 
   @@map("municipalities")
@@ -242,17 +242,38 @@ model CondoSupplyStat {
 // 既存のAreaStatistics（市区町村単位）とは別に、都道府県単位の中央値を正しく算出するため
 // Transactionから都度再計算する。scripts/aggregate-condo-market-stats.tsで洗い替えする。
 model CondoMarketStat {
-  id                String     @id @default(cuid())
-  prefectureCode    String     @map("prefecture_code")
-  prefecture        Prefecture @relation(fields: [prefectureCode], references: [code])
-  period            String // 例: "2024Q3"
-  medianPriceYen    BigInt     @map("median_price_yen")
-  averagePriceYen   BigInt     @map("average_price_yen")
-  sampleSize        Int        @map("sample_size") // 外れ値除去後の件数
-  transactionCount  Int        @map("transaction_count") // 外れ値除去前の元の取引件数
-  calculatedAt      DateTime   @default(now()) @map("calculated_at")
+  id               String     @id @default(cuid())
+  prefectureCode   String     @map("prefecture_code")
+  prefecture       Prefecture @relation(fields: [prefectureCode], references: [code])
+  period           String // 例: "2024Q3"
+  medianPriceYen   BigInt     @map("median_price_yen")
+  averagePriceYen  BigInt     @map("average_price_yen")
+  sampleSize       Int        @map("sample_size") // 外れ値除去後の件数
+  transactionCount Int        @map("transaction_count") // 外れ値除去前の元の取引件数
+  calculatedAt     DateTime   @default(now()) @map("calculated_at")
 
   @@unique([prefectureCode, period])
   @@index([period])
   @@map("condo_market_stats")
+}
+
+// 東日本レインズ「月例速報マーケットウオッチ」の月次統計（首都圏・都県別・中古マンション/中古戸建）。
+// 出典: 公益財団法人東日本不動産流通機構。データは月次PDF未公開のためAPI取得ができず、
+// 新しいPDFがinboxに届くたびに手動で1ヶ月分を追記する運用（scripts/seed-reins-market-stats.ts）。
+// 価格・単価は万円単位（PDF表記のまま）で保持する。
+model ReinsMarketStat {
+  id                        String   @id @default(cuid())
+  period                    String // 例: "2026-08"（YYYY-MM）
+  region                    String // "首都圏" | "東京都区部" | "東京都" | "神奈川県" | "千葉県" | "埼玉県"
+  propertyType              String   @map("property_type") // "マンション" | "戸建"
+  contractCount             Int      @map("contract_count") // 成約件数
+  contractUnitPriceManYen   Float?   @map("contract_unit_price_man_yen") // 成約㎡単価（万円/㎡）。戸建はnull
+  contractPriceManYen       Float?   @map("contract_price_man_yen") // 成約価格（万円）。都区部・都県別データはnull（レポートに掲載が無いため）
+  newListingUnitPriceManYen Float?   @map("new_listing_unit_price_man_yen") // 新規登録㎡単価（万円/㎡）。首都圏マンションのみ
+  inventoryCount            Int?     @map("inventory_count") // 在庫件数。首都圏のみ
+  createdAt                 DateTime @default(now()) @map("created_at")
+
+  @@unique([period, region, propertyType])
+  @@index([region, propertyType])
+  @@map("reins_market_stats")
 }

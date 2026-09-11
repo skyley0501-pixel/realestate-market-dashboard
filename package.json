@@ -18,6 +18,7 @@
     "seed:policy-rates": "tsx scripts/seed-policy-rates.ts",
     "fetch:rate-news": "tsx scripts/fetch-rate-news.ts",
     "seed:municipality-centroids": "tsx scripts/seed-municipality-centroids.ts",
+    "seed:reins-market-stats": "tsx scripts/seed-reins-market-stats.ts",
     "fetch:hazard-zones": "tsx scripts/fetch-hazard-zones.ts",
     "fetch:disaster-history": "tsx scripts/fetch-disaster-history.ts",
     "fetch:gsi-disaster-events": "tsx scripts/fetch-gsi-disaster-events.ts",

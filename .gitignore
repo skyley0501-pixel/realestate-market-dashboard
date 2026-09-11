@@ -50,6 +50,9 @@ next-env.d.ts
 # reinfolib API 取得結果（生データ、クレンジング前）
 /data/reinfolib
 
+# 東日本レインズ「月例速報マーケットウオッチ」PDF原本（著作物のため非公開。数値のみscripts/seed-reins-market-stats.tsへ転記して利用）
+/data/reins
+
 # 記事・書籍化用ネタメモ・素材（将来のnote/Kindle販売用の下書き、リポジトリ公開時にも非公開のまま保つ）
 /docs/article-notes
 /docs/screenshot

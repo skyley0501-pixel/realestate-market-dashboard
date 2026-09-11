@@ -14,4 +14,5 @@ export const ANALYSIS_LINKS = [
 export const RELATED_INFO_LINKS = [
   { href: "/rates", label: "金利動向" },
   { href: "/condo-market", label: "マンション市場動向" },
+  { href: "/reins-report", label: "首都圏中古住宅市場レポート" },
 ] as const;
