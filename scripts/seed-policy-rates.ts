@@ -17,6 +17,7 @@ const POLICY_RATE_HISTORY: { effectiveDate: string; ratePercent: number; note: s
   { effectiveDate: "2025-01-24", ratePercent: 0.5, note: "2025年1月 金融政策決定会合" },
   { effectiveDate: "2025-12-19", ratePercent: 0.75, note: "2025年12月 金融政策決定会合" },
   { effectiveDate: "2026-06-16", ratePercent: 1.0, note: "2026年6月 金融政策決定会合" },
+  { effectiveDate: "2026-09-18", ratePercent: 1.25, note: "2026年9月 金融政策決定会合" },
 ];
 
 async function main() {

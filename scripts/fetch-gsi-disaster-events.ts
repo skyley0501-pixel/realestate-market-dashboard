@@ -65,6 +65,16 @@ const DISASTER_EVENTS: DisasterEventSource[] = [
     disasterName: "浸水域等",
     source: "国土地理院 浸水推定図（令和元年台風第19号）",
   },
+  {
+    // 9/21に千葉県へ上陸。北印旛沼周辺の堤防決壊による浸水。GSIは9/22・9/24・9/25・10/1の4時点を公開しており、
+    // 浸水範囲が最も広い9/22時点の図を採用する。
+    name: "令和8年台風第25号",
+    occurredOn: "2026-09-21",
+    zipUrl: "https://www1.gsi.go.jp/geowww/saigai/20260922_typhoon25/shinsui_rinkaku_kita-inbanuma_20260922.zip",
+    disasterTypeCode: "11",
+    disasterName: "浸水域等",
+    source: "国土地理院 浸水推定図（令和8年台風第25号）",
+  },
 ];
 
 interface MunicipalityFeature {

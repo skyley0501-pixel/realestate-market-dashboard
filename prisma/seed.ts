@@ -1,6 +1,9 @@
 // scripts/fetch-reinfolib.ts が data/reinfolib/*.json に保存した生データをクレンジングし、
 // Prefecture/Municipality をupsertした上でTransactionへ投入するシードスクリプト。
 // 実行: npx prisma db seed
+// 差分投入: npx prisma db seed -- --period 2026Q2
+//   指定期間のファイル(*_2026Q2.json)だけを読み、DB上の同期間のTransactionを削除してから投入し直す（冪等）。
+//   --period 未指定の場合は全ファイルをそのまま追加投入する（空DBへの初期投入用。既存データがあると重複する）。
 import "dotenv/config";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
@@ -11,10 +14,17 @@ import { transformRecords } from "./lib/reinfolib-transform.ts";
 
 const DATA_DIR = path.join(process.cwd(), "data", "reinfolib");
 
-async function loadRecords(): Promise<ReinfolibTransactionRecord[]> {
+function parsePeriodArg(argv: string[]): string | null {
+  const index = argv.indexOf("--period");
+  return index >= 0 ? (argv[index + 1] ?? null) : null;
+}
+
+async function loadRecords(period: string | null): Promise<ReinfolibTransactionRecord[]> {
   let files: string[];
   try {
-    files = (await readdir(DATA_DIR)).filter((f) => f.endsWith(".json"));
+    files = (await readdir(DATA_DIR)).filter(
+      (f) => f.endsWith(".json") && (period === null || f.endsWith(`_${period}.json`)),
+    );
   } catch {
     return [];
   }
@@ -28,7 +38,8 @@ async function loadRecords(): Promise<ReinfolibTransactionRecord[]> {
 }
 
 async function main() {
-  const rawRecords = await loadRecords();
+  const period = parsePeriodArg(process.argv.slice(2));
+  const rawRecords = await loadRecords(period);
   if (rawRecords.length === 0) {
     console.log(
       `${DATA_DIR} にJSONファイルが見つかりません。先に "npm run fetch:reinfolib" で取得してください（REINFOLIB_API_KEYが必要）。`,
@@ -63,6 +74,11 @@ async function main() {
         create: { code: m.code, name: m.name, prefectureCode: m.prefectureCode },
         update: { name: m.name, prefectureCode: m.prefectureCode },
       });
+    }
+
+    if (period !== null) {
+      const deleted = await prisma.transaction.deleteMany({ where: { transactionPeriod: period } });
+      console.log(`既存の${period}のTransactionを${deleted.count}件削除しました。`);
     }
 
     const BATCH_SIZE = 5000;

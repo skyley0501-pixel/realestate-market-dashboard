@@ -103,6 +103,9 @@ export default async function ReinsReportPage() {
               </Card>
               <p className="mb-6 text-xs text-muted-foreground">
                 成約件数は減少傾向、在庫件数は増加傾向が続いており、売り物件が積み上がりやすい状況がうかがえます。
+                {contractCountYoy !== null &&
+                  inventoryCountYoy !== null &&
+                  ` ${formatPeriodLabel(latestCondo.period)}度は、成約件数が前年同月比${formatYoyText(contractCountYoy)}、在庫件数が前年同月比${formatYoyText(inventoryCountYoy)}となりました。${contractCountYoy < 0 && inventoryCountYoy > 0 ? "成約は前年を下回り、在庫は前年を上回る状況です。" : ""}`}
               </p>
 
               <Card className="mb-2">
