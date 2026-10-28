@@ -162,14 +162,20 @@ async function main() {
     console.log(`  -> 関東エリアのポリゴン: ${features.length}件`);
 
     // 市区町村コードごとにポリゴンをグループ化する
-    const byMunicipality = new Map<string, GeoJSON.Polygon[]>();
+    // 元データのgeometryはPolygon（令和元年東日本台風）とMultiPolygon（令和8年台風第25号）が混在するため、
+    // どちらも「Polygonの座標配列」のリストに展開してから束ねる（MultiPolygonをそのまま入れると入れ子が1段深くなり描画されない）
+    const byMunicipality = new Map<string, GeoJSON.Position[][][]>();
     for (const feature of features) {
       const point = centroidOf(feature.geometry);
       if (!point) continue;
+      const polygonCoordinates =
+        feature.geometry.type === "MultiPolygon"
+          ? feature.geometry.coordinates
+          : [(feature.geometry as GeoJSON.Polygon).coordinates];
       for (const [code, geometry] of municipalityGeometries) {
         if (isPointInGeometry(point, geometry)) {
           const list = byMunicipality.get(code) ?? [];
-          list.push(feature.geometry as GeoJSON.Polygon);
+          list.push(...polygonCoordinates);
           byMunicipality.set(code, list);
           break;
         }
@@ -180,7 +186,7 @@ async function main() {
     for (const [municipalityCode, polygons] of byMunicipality) {
       const geometry: GeoJSON.MultiPolygon = {
         type: "MultiPolygon",
-        coordinates: polygons.map((p) => p.coordinates),
+        coordinates: polygons,
       };
       await prisma.disasterHistory.upsert({
         where: {
